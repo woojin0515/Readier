@@ -1,0 +1,4 @@
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "Readier")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "Readier.Views")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "Readier.ViewModels")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "Readier.Models")]
