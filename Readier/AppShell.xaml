@@ -3,12 +3,12 @@
     x:Class="Readier.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Readier"
+    xmlns:views="clr-namespace:Readier.Views"
     Title="Readier">
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Title="일정"
+        ContentTemplate="{DataTemplate views:ScheduleListPage}"
+        Route="ScheduleListPage" />
 
 </Shell>

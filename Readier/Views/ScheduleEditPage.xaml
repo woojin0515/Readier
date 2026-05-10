@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Readier.ViewModels"
+             x:Class="Readier.Views.ScheduleEditPage"
+             x:DataType="vm:ScheduleEditViewModel"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+
+            <Label Text="제목" FontSize="13" Opacity="0.7" />
+            <Entry Text="{Binding ScheduleTitle}"
+                   Placeholder="예: 팀 회의"
+                   ClearButtonVisibility="WhileEditing" />
+
+            <Label Text="장소" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
+            <Entry Text="{Binding Location}"
+                   Placeholder="예: 강남역 3번 출구"
+                   ClearButtonVisibility="WhileEditing" />
+
+            <Label Text="날짜" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
+            <DatePicker Date="{Binding StartDate}" />
+
+            <Label Text="시작 시간" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
+            <TimePicker Time="{Binding StartTime}" />
+
+            <Label Text="이동 시간 (분)" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
+            <Entry Text="{Binding TravelMinutes}" Keyboard="Numeric" />
+
+            <Label Text="준비 시간 (분)" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
+            <Entry Text="{Binding PrepMinutes}" Keyboard="Numeric" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="#cc3344"
+                   FontSize="13"
+                   IsVisible="{Binding HasError}"
+                   Margin="0,8,0,0" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,16,0,0">
+                <Button Grid.Column="0"
+                        Text="취소"
+                        Command="{Binding CancelCommand}" />
+                <Button Grid.Column="1"
+                        Text="저장"
+                        Command="{Binding SaveCommand}" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

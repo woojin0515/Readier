@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Readier.ViewModels"
+             xmlns:m="clr-namespace:Readier.Models"
+             x:Class="Readier.Views.ScheduleListPage"
+             x:DataType="vm:ScheduleListViewModel"
+             x:Name="page"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="*">
+        <CollectionView ItemsSource="{Binding Schedules}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Padding="32"
+                                     Spacing="8">
+                    <Label Text="아직 일정이 없습니다"
+                           FontSize="18"
+                           HorizontalOptions="Center"
+                           Opacity="0.7" />
+                    <Label Text="우측 하단 + 버튼으로 첫 일정을 추가해 보세요"
+                           FontSize="13"
+                           HorizontalOptions="Center"
+                           Opacity="0.5" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="m:Schedule">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Reveal">
+                                <SwipeItem Text="삭제"
+                                           BackgroundColor="#cc3344"
+                                           Command="{Binding Source={x:Reference page}, Path=ViewModel.DeleteCommand}"
+                                           CommandParameter="{Binding .}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Border Stroke="Transparent"
+                                Padding="16,14"
+                                Margin="12,6"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{AppThemeBinding Light=#f2f2f7, Dark=#1c1c1e}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=ViewModel.EditCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding Title}"
+                                       FontSize="17"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Location}"
+                                       FontSize="13"
+                                       Opacity="0.7" />
+                                <Label Text="{Binding StartTime, StringFormat='{0:yyyy-MM-dd (ddd) HH:mm}'}"
+                                       FontSize="12"
+                                       Opacity="0.6" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="+"
+                FontSize="28"
+                FontAttributes="Bold"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,24"
+                Command="{Binding AddCommand}" />
+    </Grid>
+</ContentPage>

@@ -361,3 +361,44 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+###############################################################################
+# Project-specific additions (Readier)
+###############################################################################
+
+# ---- Claude Code local state ----
+# Per-machine permission/env overrides — must NOT be shared.
+# Shared agent config (.claude/settings.json, .claude/agents/, .claude/commands/)
+# may still be committed if the team agrees.
+.claude/settings.local.json
+.claude/projects/
+.claude/todos/
+.claude/statsig/
+.claude/shell-snapshots/
+.claude/ide/
+.claude/__store.db*
+
+# ---- Secrets & credentials (NEVER commit) ----
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+.env
+.env.*
+google-services.json
+GoogleService-Info.plist
+*.snk
+*.p12
+*.keystore
+*.jks
+
+# ---- Editor / IDE ----
+.idea/
+.vscode/
+*.swp
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

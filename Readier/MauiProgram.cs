@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Readier.Interfaces;
 using Readier.Services;
+using Readier.ViewModels;
+using Readier.Views;
 
 namespace Readier
 {
@@ -17,6 +20,8 @@ namespace Readier
                 });
 
             RegisterServices(builder.Services);
+            RegisterViewModels(builder.Services);
+            RegisterPages(builder.Services);
 
 #if DEBUG
             builder.Logging.AddDebug();
@@ -27,7 +32,19 @@ namespace Readier
 
         private static void RegisterServices(IServiceCollection services)
         {
-            services.AddSingleton<IScheduleStore, ScheduleStore>();
+            services.AddSingleton<IStorageService, PreferencesStorageService>();
+        }
+
+        private static void RegisterViewModels(IServiceCollection services)
+        {
+            services.AddTransient<ScheduleListViewModel>();
+            services.AddTransient<ScheduleEditViewModel>();
+        }
+
+        private static void RegisterPages(IServiceCollection services)
+        {
+            services.AddTransient<ScheduleListPage>();
+            services.AddTransient<ScheduleEditPage>();
         }
     }
 }
