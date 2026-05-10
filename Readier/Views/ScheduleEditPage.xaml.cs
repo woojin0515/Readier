@@ -4,9 +4,11 @@ namespace Readier.Views;
 
 public partial class ScheduleEditPage : ContentPage
 {
+    public ScheduleEditViewModel ViewModel { get; }
+
     public ScheduleEditPage(ScheduleEditViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = viewModel;
+        BindingContext = ViewModel = viewModel;
     }
 }

@@ -24,7 +24,7 @@
 		<ApplicationTitle>Readier</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.readier</ApplicationId>
+		<ApplicationId>com.readier.app</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -62,6 +62,36 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
+	</ItemGroup>
+
+	<!-- API keys are injected at build time from environment variables.
+	     The generated file lives under obj/ (gitignored). When env vars are
+	     missing the constants become empty strings; runtime services surface
+	     a clear "키가 설정되지 않았습니다" error instead of crashing. -->
+	<PropertyGroup>
+		<GeneratedApiKeysFile>$(MSBuildProjectDirectory)\obj\Generated\ApiKeys.g.cs</GeneratedApiKeysFile>
+	</PropertyGroup>
+
+	<Target Name="GenerateApiKeys" BeforeTargets="BeforeCompile;CoreCompile">
+		<PropertyGroup>
+			<KakaoNativeAppKey>$([System.Environment]::GetEnvironmentVariable('KAKAO_NATIVE_APP_KEY'))</KakaoNativeAppKey>
+		</PropertyGroup>
+		<MakeDir Directories="$(IntermediateOutputPath)Generated" />
+		<ItemGroup>
+			<ApiKeysLine Include="// &lt;auto-generated /&gt;" />
+			<ApiKeysLine Include="namespace Readier%3B" />
+			<ApiKeysLine Include="internal static class ApiKeys" />
+			<ApiKeysLine Include="{" />
+			<ApiKeysLine Include="    public const string KakaoNativeAppKey = &quot;$(KakaoNativeAppKey)&quot;%3B" />
+			<ApiKeysLine Include="    public static bool HasKakaoKey =&gt; !string.IsNullOrWhiteSpace(KakaoNativeAppKey)%3B" />
+			<ApiKeysLine Include="}" />
+		</ItemGroup>
+		<WriteLinesToFile File="$(GeneratedApiKeysFile)" Lines="@(ApiKeysLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+	</Target>
+
+	<ItemGroup>
+		<Compile Include="$(GeneratedApiKeysFile)" Visible="false" />
 	</ItemGroup>
 
 </Project>

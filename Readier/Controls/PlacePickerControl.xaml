@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:m="clr-namespace:Readier.Models"
+             x:Class="Readier.Controls.PlacePickerControl"
+             x:Name="root">
+
+    <VerticalStackLayout Spacing="6">
+
+        <Border Stroke="Transparent"
+                StrokeShape="RoundRectangle 12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource ReadierSurfaceLight}, Dark={StaticResource ReadierSurfaceDark}}"
+                Padding="14,2">
+            <Grid ColumnDefinitions="22,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                <Label Grid.Column="0"
+                       Text="📍"
+                       FontSize="14"
+                       VerticalOptions="Center"
+                       Opacity="0.65" />
+                <Entry Grid.Column="1"
+                       x:Name="QueryEntry"
+                       Placeholder="{Binding Placeholder, Source={x:Reference root}}"
+                       Text="{Binding QueryText, Source={x:Reference root}, Mode=TwoWay}"
+                       TextChanged="OnEntryTextChanged"
+                       FontSize="15"
+                       BackgroundColor="Transparent" />
+                <ActivityIndicator Grid.Column="2"
+                                   IsRunning="{Binding IsSearching, Source={x:Reference root}}"
+                                   IsVisible="{Binding IsSearching, Source={x:Reference root}}"
+                                   WidthRequest="20"
+                                   HeightRequest="20"
+                                   VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <Border IsVisible="{Binding HasResults, Source={x:Reference root}}"
+                Stroke="Transparent"
+                StrokeShape="RoundRectangle 12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource ReadierSurfaceLight}, Dark={StaticResource ReadierSurfaceDark}}"
+                Padding="0,4"
+                MaximumHeightRequest="240">
+            <CollectionView ItemsSource="{Binding Results, Source={x:Reference root}}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="m:PlaceSearchResult">
+                        <Grid Padding="14,10">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer CommandParameter="{Binding .}"
+                                                      Tapped="OnResultTapped" />
+                            </Grid.GestureRecognizers>
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding DisplayLine}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light={StaticResource ReadierTextLight}, Dark={StaticResource ReadierTextDark}}" />
+                                <Label Text="{Binding SubLine}"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource ReadierTextSubtleLight}, Dark={StaticResource ReadierTextSubtleDark}}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+
+    </VerticalStackLayout>
+</ContentView>

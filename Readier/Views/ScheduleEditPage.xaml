@@ -2,49 +2,191 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Readier.ViewModels"
+             xmlns:c="clr-namespace:Readier.Controls"
+             xmlns:h="clr-namespace:Readier.Helpers"
              x:Class="Readier.Views.ScheduleEditPage"
              x:DataType="vm:ScheduleEditViewModel"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource ReadierBgLight}, Dark={StaticResource ReadierBgDark}}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="14">
+    <Grid RowDefinitions="*,Auto">
 
-            <Label Text="제목" FontSize="13" Opacity="0.7" />
-            <Entry Text="{Binding ScheduleTitle}"
-                   Placeholder="예: 팀 회의"
-                   ClearButtonVisibility="WhileEditing" />
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="16,12,16,16" Spacing="14">
 
-            <Label Text="장소" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
-            <Entry Text="{Binding Location}"
-                   Placeholder="예: 강남역 3번 출구"
-                   ClearButtonVisibility="WhileEditing" />
+                <!-- Title -->
+                <Border Style="{StaticResource SurfaceCard}" Padding="16,10">
+                    <Entry Text="{Binding ScheduleTitle}"
+                           Placeholder="제목"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           BackgroundColor="Transparent" />
+                </Border>
 
-            <Label Text="날짜" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
-            <DatePicker Date="{Binding StartDate}" />
+                <!-- Origin / Destination -->
+                <Label Text="이동" Style="{StaticResource SectionHeader}" />
 
-            <Label Text="시작 시간" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
-            <TimePicker Time="{Binding StartTime}" />
+                <c:PlacePickerControl Placeholder="출발지"
+                                      SearchService="{Binding PlaceSearch}"
+                                      SelectedPlace="{Binding OriginPlace}" />
 
-            <Label Text="이동 시간 (분)" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
-            <Entry Text="{Binding TravelMinutes}" Keyboard="Numeric" />
+                <c:PlacePickerControl Placeholder="목적지"
+                                      SearchService="{Binding PlaceSearch}"
+                                      SelectedPlace="{Binding DestinationPlace}" />
 
-            <Label Text="준비 시간 (분)" FontSize="13" Opacity="0.7" Margin="0,4,0,0" />
-            <Entry Text="{Binding PrepMinutes}" Keyboard="Numeric" />
+                <!-- Transportation + Calculate -->
+                <Border Style="{StaticResource SurfaceCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="이동 수단"
+                                   FontSize="13"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource ReadierTextLight}, Dark={StaticResource ReadierTextDark}}" />
+                            <Picker Grid.Column="1"
+                                    ItemsSource="{Binding TransportationOptions}"
+                                    SelectedItem="{Binding TransportationOption}"
+                                    ItemDisplayBinding="{Binding Label, x:DataType=h:TransportationOption}"
+                                    FontSize="14"
+                                    TextColor="{StaticResource ReadierAccent}"
+                                    HorizontalOptions="End"
+                                    WidthRequest="160" />
+                        </Grid>
+                        <Button Text="이동 시간 계산"
+                                Command="{Binding CalculateTravelTimeCommand}"
+                                IsEnabled="{Binding IsNotCalculating}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource ReadierAccent}"
+                                BorderColor="{StaticResource ReadierAccent}"
+                                BorderWidth="1"
+                                CornerRadius="10"
+                                HeightRequest="42"
+                                FontSize="13"
+                                FontAttributes="Bold" />
+                        <ActivityIndicator IsRunning="{Binding IsCalculating}"
+                                           IsVisible="{Binding IsCalculating}"
+                                           Color="{StaticResource ReadierAccent}" />
+                    </VerticalStackLayout>
+                </Border>
 
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="#cc3344"
-                   FontSize="13"
-                   IsVisible="{Binding HasError}"
-                   Margin="0,8,0,0" />
+                <!-- Time -->
+                <Label Text="시간" Style="{StaticResource SectionHeader}" />
+                <Border Style="{StaticResource SurfaceCard}">
+                    <VerticalStackLayout Spacing="2">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="날짜"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource ReadierTextLight}, Dark={StaticResource ReadierTextDark}}" />
+                            <DatePicker Grid.Column="1"
+                                        Date="{Binding StartDate}"
+                                        FontSize="14"
+                                        TextColor="{StaticResource ReadierAccent}" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource ReadierDividerLight}, Dark={StaticResource ReadierDividerDark}}" Margin="0,6" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="시작 시간"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource ReadierTextLight}, Dark={StaticResource ReadierTextDark}}" />
+                            <TimePicker Grid.Column="1"
+                                        Time="{Binding StartTime}"
+                                        FontSize="14"
+                                        TextColor="{StaticResource ReadierAccent}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,16,0,0">
+                <!-- Travel + Prep minutes -->
+                <Label Text="이동 / 준비 (분)" Style="{StaticResource SectionHeader}" />
+                <Border Style="{StaticResource SurfaceCard}">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="이동 시간"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource ReadierTextSubtleLight}, Dark={StaticResource ReadierTextSubtleDark}}" />
+                            <Entry Text="{Binding TravelMinutes}"
+                                   Keyboard="Numeric"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   BackgroundColor="Transparent" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="준비 시간"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource ReadierTextSubtleLight}, Dark={StaticResource ReadierTextSubtleDark}}" />
+                            <Entry Text="{Binding PrepMinutes}"
+                                   Keyboard="Numeric"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   BackgroundColor="Transparent" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- 추천 시각 -->
+                <Label Text="추천 시각" Style="{StaticResource SectionHeader}" />
+                <Border Style="{StaticResource SurfaceCard}"
+                        BackgroundColor="{StaticResource ReadierAccent}">
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="6">
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="준비 시작"
+                               FontSize="12"
+                               TextColor="White"
+                               Opacity="0.85" />
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="{Binding StartPrepAt, StringFormat='{0:HH:mm}'}"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="End" />
+                        <Label Grid.Row="1" Grid.Column="0"
+                               Text="출발"
+                               FontSize="12"
+                               TextColor="White"
+                               Opacity="0.85" />
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="{Binding LeaveAt, StringFormat='{0:HH:mm}'}"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="End" />
+                    </Grid>
+                </Border>
+
+                <!-- Status messages -->
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{StaticResource ReadierDanger}"
+                       FontSize="13"
+                       IsVisible="{Binding HasError}"
+                       Margin="4,0" />
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{StaticResource ReadierAccent}"
+                       FontSize="13"
+                       IsVisible="{Binding HasInfo}"
+                       Margin="4,0" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom action bar -->
+        <Border Grid.Row="1"
+                Stroke="Transparent"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource ReadierSurfaceLight}, Dark={StaticResource ReadierSurfaceDark}}"
+                Padding="16,12,16,16">
+            <Grid ColumnDefinitions="120,*" ColumnSpacing="10">
                 <Button Grid.Column="0"
                         Text="취소"
+                        Style="{StaticResource SecondaryButton}"
                         Command="{Binding CancelCommand}" />
                 <Button Grid.Column="1"
                         Text="저장"
+                        Style="{StaticResource PrimaryButton}"
                         Command="{Binding SaveCommand}" />
             </Grid>
-        </VerticalStackLayout>
-    </ScrollView>
+        </Border>
+    </Grid>
 </ContentPage>

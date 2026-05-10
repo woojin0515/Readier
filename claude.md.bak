@@ -1,0 +1,403 @@
+# Readier
+
+Readier is an AI-assisted scheduling and preparation mobile app.
+
+The app helps users arrive on time by analyzing:
+- preparation time
+- travel time
+- user habits
+- daily routines
+- delay patterns
+
+The goal is to reduce lateness and help users build healthier time management habits.
+
+Readier follows a privacy-focused and local-first architecture.
+
+---
+
+# Core Features
+
+## 1. Smart Schedule Planner
+
+Users can create schedules and appointments.
+
+Each schedule includes:
+- title
+- location
+- start time
+- estimated travel time
+- estimated preparation time
+
+The app calculates when the user should begin preparing and when they should leave.
+
+---
+
+## 2. Habit Analysis
+
+The app analyzes user behavior patterns such as:
+- average preparation time
+- lateness frequency
+- daily routine consistency
+- movement and departure patterns
+
+The app should gradually personalize recommendations over time.
+
+All analysis should prioritize local processing whenever possible.
+
+---
+
+## 3. Smart Preparation Alerts
+
+The app calculates when the user should:
+- wake up
+- prepare
+- leave home
+
+Notifications should adapt based on real user behavior and schedule history.
+
+The app should remain functional even without internet access.
+
+---
+
+# Design Philosophy
+
+The app should feel:
+- simple
+- clean
+- calm
+- minimal
+- supportive
+
+Avoid cluttered UI and overwhelming information.
+
+Prioritize usability and clarity over visual complexity.
+
+The experience should reduce stress, not create pressure.
+
+---
+
+# Technical Stack
+
+## Frontend
+- .NET MAUI
+- C#
+- MVVM architecture
+
+## Local Storage
+- Preferences + JSON (MVP)
+- Future migration to SQLite should remain possible
+
+## APIs
+- Google Maps API
+- Optional AI APIs in the future
+
+Cloud services are NOT required for the MVP.
+
+---
+
+# Architecture Philosophy
+
+Readier uses a local-first architecture.
+
+Core app functionality should work fully offline.
+
+User data should remain on the user's device whenever possible.
+
+Avoid unnecessary server communication.
+
+The app should minimize dependency on external services.
+
+---
+
+# Privacy Principles
+
+- Minimize data collection
+- Avoid unnecessary network requests
+- Keep personal schedules and behavior data local
+- Do not upload user habit data by default
+- Prioritize transparency and user privacy
+
+The app should feel trustworthy and privacy-friendly.
+
+---
+
+# Security Rules
+
+- Never hardcode API keys in source code
+- Use secure storage for sensitive credentials
+- Separate secrets from UI/business logic
+- Avoid excessive logging of user data
+- Do not send personal behavioral data to external APIs unless explicitly required
+
+Sensitive logic should be isolated into services.
+
+---
+
+# Project Structure
+
+Use clean MVVM architecture.
+
+Folders:
+- Views
+- ViewModels
+- Models
+- Services
+- Helpers
+- Interfaces
+
+Business logic should never be directly written inside UI pages.
+
+Storage logic should remain abstracted behind interfaces to allow future migration.
+
+---
+
+# Development Rules
+
+- Keep code modular and maintainable
+- Use async/await properly
+- Avoid hardcoded values
+- Write reusable services
+- Use dependency injection when appropriate
+- Keep ViewModels lightweight
+- Separate UI logic from business logic
+- Prefer simple and readable implementations
+
+Avoid overengineering early versions.
+
+---
+
+# UI Rules
+
+- Use dark-mode-friendly colors
+- Avoid excessive animations
+- Prioritize one-handed usability
+- Keep navigation simple
+- Use large touch-friendly UI elements
+- Maintain consistent spacing and typography
+
+The UI should feel lightweight and fast.
+
+---
+
+# MVP Goal
+
+First milestone:
+
+Users can:
+1. create schedules
+2. enter locations
+3. receive leave-time recommendations
+4. receive notifications
+5. save schedule data locally
+
+Focus on building stable core functionality first.
+
+Do NOT prioritize:
+- cloud sync
+- accounts
+- advanced AI
+- social features
+- complex analytics
+
+The MVP should remain simple and reliable.
+
+---
+
+# Future Features
+
+Possible future expansions:
+- AI schedule optimization
+- automatic habit learning
+- smartwatch support
+- voice assistant
+- traffic prediction
+- automatic wake-up scheduling
+- optional cloud backup
+- multi-device sync
+
+Future features should not compromise privacy-first principles.
+
+---
+
+# AI Features
+
+AI-related functionality should:
+- prefer local analysis whenever possible
+- minimize external API usage
+- remain optional
+- avoid collecting unnecessary personal data
+
+The app should still function properly without AI features enabled.
+
+---
+
+# Important Notes
+
+This app is designed primarily for:
+- students
+- busy people
+- users struggling with time management
+- users who frequently run late
+
+The app should feel:
+- helpful
+- supportive
+- calm
+- non-judgmental
+
+The goal is to improve habits gradually without making users feel stressed or pressured.
+
+---
+
+# new
+
+---
+
+# User Behavior Analysis
+
+Readier should include a lightweight user behavior analysis system to improve preparation-time accuracy.
+
+The goal is NOT deep personal profiling.
+
+The goal is to estimate realistic preparation time based on simple user-selected habits and routines.
+
+The system should remain privacy-friendly and local-first.
+
+---
+
+## User Preparation Profile
+
+The app should allow users to optionally configure preparation-related behavior settings.
+
+Possible configurable items:
+- shower duration
+- makeup usage
+- hair styling time
+- outfit selection time
+- skincare routine duration
+- breakfast habits
+- typical preparation speed
+- morning routine complexity
+
+The app should use these values to estimate preparation time more accurately.
+
+Avoid invasive or unnecessary questions.
+
+All behavior-related data should remain stored locally.
+
+---
+
+## Adaptive Preparation Analysis
+
+The app should gradually learn from:
+- actual departure times
+- notification response delays
+- repeated lateness patterns
+- schedule completion behavior
+- average real preparation duration
+
+The app should continuously improve recommendation accuracy over time.
+
+The analysis should remain lightweight and explainable.
+
+Avoid overly complex AI behavior in early versions.
+
+---
+
+# Transportation and Travel Analysis
+
+Readier should estimate travel time based on:
+- current location
+- destination
+- selected transportation method
+- estimated traffic/travel conditions
+
+Supported transportation methods may include:
+- walking
+- bicycle
+- public transportation
+- car
+- taxi
+
+The app should allow users to select their preferred default transportation method.
+
+Future versions may automatically recommend transportation methods.
+
+---
+
+## Travel Time Intelligence
+
+The app should:
+- calculate estimated departure times
+- consider real travel duration
+- update recommendations when travel conditions change
+- combine travel time with preparation time
+
+Travel recommendations should prioritize reliability over aggressive optimization.
+
+The app should reduce the risk of lateness rather than minimize every minute.
+
+---
+
+# Menu Structure
+
+The app should contain a simple bottom navigation or menu system.
+
+Suggested sections:
+- Home
+- Schedule
+- Behavior Analysis
+- Notifications
+- Settings
+
+Navigation should remain simple and one-handed friendly.
+
+Avoid excessive nested menus.
+
+---
+
+# Settings System
+
+The settings page should include:
+- notification preferences
+- transportation preferences
+- default preparation settings
+- privacy settings
+- dark mode support
+- AI feature toggles
+
+Users should always remain in control of:
+- their data
+- notifications
+- AI-related functionality
+
+---
+
+# AI Design Philosophy
+
+AI in Readier should:
+- assist users calmly
+- avoid being intrusive
+- remain transparent
+- prioritize practical usefulness
+
+The app should never feel controlling or stressful.
+
+Recommendations should feel helpful rather than judgmental.
+
+---
+
+# Future AI Possibilities
+
+Possible future AI improvements:
+- automatic preparation-time estimation
+- personalized schedule recommendations
+- adaptive wake-up timing
+- repeated lateness detection
+- smart transportation suggestions
+
+All future AI features should continue following:
+- privacy-first principles
+- local-first architecture
+- explainable behavior
+- low-stress user experience

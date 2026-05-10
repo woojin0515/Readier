@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Readier.Interfaces;
@@ -11,14 +12,26 @@ public partial class ScheduleListViewModel : BaseViewModel
 {
     internal const string StorageKey = "readier.schedules.v1";
 
+    private static readonly CultureInfo KoreanCulture = new("ko-KR");
+
     private readonly IStorageService _storage;
+    private readonly IScheduleNotificationService _notifications;
+    private readonly ILeaveTimeCalculator _calculator;
 
-    public ObservableCollection<Schedule> Schedules { get; } = new();
+    public ObservableCollection<ScheduleGroup> Groups { get; } = new();
 
-    public ScheduleListViewModel(IStorageService storage)
+    [ObservableProperty]
+    private bool isEmpty;
+
+    public ScheduleListViewModel(
+        IStorageService storage,
+        IScheduleNotificationService notifications,
+        ILeaveTimeCalculator calculator)
     {
         _storage = storage;
-        Title = "내 일정";
+        _notifications = notifications;
+        _calculator = calculator;
+        Title = "일정";
     }
 
     [RelayCommand]
@@ -28,10 +41,7 @@ public partial class ScheduleListViewModel : BaseViewModel
         IsBusy = true;
         try
         {
-            var list = await _storage.GetAsync<List<Schedule>>(StorageKey) ?? new List<Schedule>();
-            Schedules.Clear();
-            foreach (var s in list.OrderBy(x => x.StartTime))
-                Schedules.Add(s);
+            await RebuildAsync();
         }
         finally
         {
@@ -44,19 +54,51 @@ public partial class ScheduleListViewModel : BaseViewModel
         => Shell.Current.GoToAsync(nameof(ScheduleEditPage));
 
     [RelayCommand]
-    private Task EditAsync(Schedule? schedule)
-        => schedule is null
+    private Task EditAsync(ScheduleListItemViewModel? item)
+        => item is null
             ? Task.CompletedTask
-            : Shell.Current.GoToAsync($"{nameof(ScheduleEditPage)}?id={schedule.Id}");
+            : Shell.Current.GoToAsync($"{nameof(ScheduleEditPage)}?id={item.Id}");
 
     [RelayCommand]
-    private async Task DeleteAsync(Schedule? schedule)
+    private async Task DeleteAsync(ScheduleListItemViewModel? item)
     {
-        if (schedule is null) return;
+        if (item is null) return;
+
+        await _notifications.CancelAsync(item.Id);
 
         var list = await _storage.GetAsync<List<Schedule>>(StorageKey) ?? new List<Schedule>();
-        list.RemoveAll(s => s.Id == schedule.Id);
+        list.RemoveAll(s => s.Id == item.Id);
         await _storage.SetAsync(StorageKey, list);
-        Schedules.Remove(schedule);
+
+        await RebuildAsync();
+    }
+
+    private async Task RebuildAsync()
+    {
+        var list = await _storage.GetAsync<List<Schedule>>(StorageKey) ?? new List<Schedule>();
+        var items = list
+            .OrderBy(s => s.StartTime)
+            .Select(s => new ScheduleListItemViewModel(s, _calculator.Calculate(s)))
+            .ToList();
+
+        var grouped = items
+            .GroupBy(i => i.StartTime.Date)
+            .OrderBy(g => g.Key)
+            .Select(g => new ScheduleGroup(g.Key, FormatGroupTitle(g.Key), g))
+            .ToList();
+
+        Groups.Clear();
+        foreach (var group in grouped) Groups.Add(group);
+
+        IsEmpty = Groups.Count == 0;
+    }
+
+    private static string FormatGroupTitle(DateTime date)
+    {
+        var today = DateTime.Today;
+        if (date == today) return "오늘";
+        if (date == today.AddDays(1)) return "내일";
+        if (date == today.AddDays(-1)) return "어제";
+        return date.ToString("M월 d일 (ddd)", KoreanCulture);
     }
 }
