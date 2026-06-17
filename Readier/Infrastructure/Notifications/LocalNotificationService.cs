@@ -32,13 +32,16 @@ public class LocalNotificationService : IScheduleNotificationService
         var description = string.IsNullOrWhiteSpace(destinationLabel)
             ? schedule.Title
             : $"{schedule.Title} · {destinationLabel}";
+        var useCalmCopy = prefs.Notification.UseCalmReminderCopy;
+        var prepTitle = useCalmCopy ? "이제 천천히 준비를 시작해 볼까요?" : "준비 시작 시간이에요";
+        var leaveTitle = useCalmCopy ? "지금 출발하면 여유 있게 도착할 수 있어요" : "출발할 시간이에요";
 
         if (plan.StartPrepAt > now)
         {
             await LocalNotificationCenter.Current.Show(new NotificationRequest
             {
                 NotificationId = PrepId(schedule.Id),
-                Title = "준비 시작 시간이에요",
+                Title = prepTitle,
                 Description = description,
                 Schedule = new NotificationRequestSchedule { NotifyTime = plan.StartPrepAt }
             });
@@ -49,10 +52,25 @@ public class LocalNotificationService : IScheduleNotificationService
             await LocalNotificationCenter.Current.Show(new NotificationRequest
             {
                 NotificationId = LeaveId(schedule.Id),
-                Title = "출발할 시간이에요",
+                Title = leaveTitle,
                 Description = description,
                 Schedule = new NotificationRequestSchedule { NotifyTime = plan.LeaveAt }
             });
+        }
+
+        if (prefs.Notification.LeaveSoonReminderMinutes > 0)
+        {
+            var beforeLeave = plan.LeaveAt.AddMinutes(-prefs.Notification.LeaveSoonReminderMinutes);
+            if (beforeLeave > now && beforeLeave < plan.LeaveAt)
+            {
+                await LocalNotificationCenter.Current.Show(new NotificationRequest
+                {
+                    NotificationId = LeaveSoonId(schedule.Id),
+                    Title = $"출발 {prefs.Notification.LeaveSoonReminderMinutes}분 전",
+                    Description = description,
+                    Schedule = new NotificationRequestSchedule { NotifyTime = beforeLeave }
+                });
+            }
         }
     }
 
@@ -60,6 +78,7 @@ public class LocalNotificationService : IScheduleNotificationService
     {
         LocalNotificationCenter.Current.Cancel(PrepId(scheduleId));
         LocalNotificationCenter.Current.Cancel(LeaveId(scheduleId));
+        LocalNotificationCenter.Current.Cancel(LeaveSoonId(scheduleId));
         return Task.CompletedTask;
     }
 
@@ -73,4 +92,6 @@ public class LocalNotificationService : IScheduleNotificationService
     private static int PrepId(Guid id) => HashCode.Combine(id, "prep") & 0x7FFFFFFF;
 
     private static int LeaveId(Guid id) => HashCode.Combine(id, "leave") & 0x7FFFFFFF;
+
+    private static int LeaveSoonId(Guid id) => HashCode.Combine(id, "leave-soon") & 0x7FFFFFFF;
 }

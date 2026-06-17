@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Readier.Interfaces;
+using Readier.Models;
 
 namespace Readier.ViewModels;
 
@@ -9,8 +10,20 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly IUserPreferencesService _preferences;
     private bool _isLoading = true;
 
+    public IReadOnlyList<int> ReminderMinuteOptions { get; } = NotificationInteractionSpec.LeaveSoonOptions;
+    public IReadOnlyList<int> SnoozeMinuteOptions { get; } = NotificationInteractionSpec.SnoozePresetOptions;
+
     [ObservableProperty]
     private bool notificationsEnabled = true;
+
+    [ObservableProperty]
+    private int leaveSoonReminderMinutes = 10;
+
+    [ObservableProperty]
+    private int snoozePresetMinutes = 10;
+
+    [ObservableProperty]
+    private bool useCalmReminderCopy = true;
 
     public SettingsViewModel(IUserPreferencesService preferences)
     {
@@ -26,6 +39,9 @@ public partial class SettingsViewModel : BaseViewModel
         {
             var prefs = await _preferences.GetAsync();
             NotificationsEnabled = prefs.NotificationsEnabled;
+            LeaveSoonReminderMinutes = prefs.Notification.LeaveSoonReminderMinutes;
+            SnoozePresetMinutes = prefs.Notification.SnoozePresetMinutes;
+            UseCalmReminderCopy = prefs.Notification.UseCalmReminderCopy;
         }
         finally
         {
@@ -44,6 +60,9 @@ public partial class SettingsViewModel : BaseViewModel
     {
         var prefs = await _preferences.GetAsync();
         prefs.NotificationsEnabled = NotificationsEnabled;
+        prefs.Notification.LeaveSoonReminderMinutes = LeaveSoonReminderMinutes;
+        prefs.Notification.SnoozePresetMinutes = SnoozePresetMinutes;
+        prefs.Notification.UseCalmReminderCopy = UseCalmReminderCopy;
         await _preferences.SaveAsync(prefs);
     }
 }
