@@ -49,6 +49,9 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		
+		<!-- Android AAPT2 workaround for Windows: disable AAPT2 to avoid "Illegal byte sequence" error -->
+		<AndroidUseAapt2 Condition="'$(AndroidUseAapt2)' == ''">false</AndroidUseAapt2>
 	</PropertyGroup>
 
 	<ItemGroup>
