@@ -1,8 +1,34 @@
 # Readier Build Guide
 
-## Environment Setup ✅
+## ⚠️ IMPORTANT: Android SDK Setup Required
 
-All required tools are already installed and configured:
+Before deploying to Galaxy A32, you **MUST** complete Android Studio initial setup to download SDKs and tools.
+
+**The Android SDK hasn't been automatically downloaded yet.** Follow the Android Studio setup section below.
+
+---
+
+## 📋 Quick Status Check
+
+Run this to verify your build environment:
+
+```powershell
+cd C:\Users\최승규\source\repos\woojin0515\Readier
+.\verify-build-setup.ps1
+```
+
+This script checks:
+- ✅ Java JDK 21 LTS
+- ✅ Android Studio installation
+- ⚠️ Android SDK (may need download)
+- ✅ .NET SDK
+- ✅ Readier project files
+
+---
+
+## Environment Setup
+
+Java and Android Studio are installed, but Android SDK setup requires manual completion:
 
 - **Java JDK 21 LTS** (Eclipse Adoptium) → `C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot`
 - **Android Studio** → `C:\Program Files\Android\Android Studio`
@@ -23,26 +49,69 @@ dotnet build Readier.sln
 ⚠️ **AAPT2 limitation**: CLI builds for Android fail due to a known .NET MAUI asset packaging issue on Windows. 
 **Workaround**: Use Android Studio (see below).
 
+## 🔧 Android Studio Initial Setup (REQUIRED)
+
+**IMPORTANT:** Android Studio needs to download SDKs and build tools before you can build Android apps. This is a one-time setup.
+
+### Step 1: Launch Android Studio Initial Setup
+
+```powershell
+& 'C:\Program Files\Android\Android Studio\bin\studio64.exe'
+```
+
+### Step 2: Complete Initial Wizard
+
+1. Android Studio will show a setup wizard
+2. **Accept** all default suggestions (or skip if prompted)
+3. The wizard will download:
+   - Android SDK 35 (and other platforms)
+   - Android SDK Build-Tools
+   - Android Emulator
+   - NDK (optional, not required for Readier)
+
+⏱️ **This may take 5-20 minutes** depending on your internet speed. Let it complete fully.
+
+### Step 3: Verify SDK Installation
+
+Once Android Studio finishes setup, verify the SDK was installed:
+
+```powershell
+Get-ChildItem "C:\Users\최승규\AppData\Local\Android\Sdk" | Select-Object -First 10
+```
+
+Expected output: `platforms/`, `build-tools/`, `cmdline-tools/`, etc.
+
+---
+
 ## Building for Galaxy A32 (Recommended)
 
 ### Method 1: Android Studio GUI ✅ (RECOMMENDED)
 
-**This is the most reliable way to deploy to Galaxy A32.**
+**After completing the setup above, do this to deploy to Galaxy A32:**
 
-1. Open Android Studio:
+1. Open Android Studio (if not already open):
    ```powershell
    & 'C:\Program Files\Android\Android Studio\bin\studio64.exe'
    ```
 
-2. Open the project:
-   - File → Open → Select `C:\Users\최승규\source\repos\woojin0515\Readier\Readier.sln`
+2. Open the Readier project:
+   - File → Open → Navigate to `C:\Users\최승규\source\repos\woojin0515\Readier`
+   - Select the folder and click Open
+   - Android Studio will recognize it as a MAUI project
 
-3. Connect Galaxy A32 via USB with Developer Mode enabled
+3. Wait for Gradle sync to complete
+   - A progress bar will appear at the bottom
+   - Let it finish fully (this indexes the project)
 
-4. Build and deploy:
-   - Build → Make Project (or Ctrl+F9)
-   - Run → Run 'app' (or Shift+F10)
-   - Select Galaxy A32 from device list
+4. Connect Galaxy A32 via USB:
+   - Enable Developer Mode: Settings → About phone → Build number (tap 7 times)
+   - Enable USB Debugging: Settings → Developer options → USB Debugging
+   - Connect USB cable to computer
+
+5. Build and run:
+   - Run → Run 'app' (or press Shift+F10)
+   - Select Galaxy A32 from the device list
+   - APK will compile, install, and launch automatically
 
 ### Method 2: CLI with Flag (If AAPT2 Fixed)
 
