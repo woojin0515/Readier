@@ -2,15 +2,15 @@
     color-scheme: dark;
     
     /* Color Palette */
-    --bg: #0f1115;
-    --surface: #1b1e26;
-    --surface-subtle: #232835;
-    --border: #2a2f3a;
-    --text: #e5e7eb;
-    --text-secondary: #9da3ae;
-    --accent: #5b7cfa;
-    --accent-subtle: #2a355e;
-    --danger: #ef4444;
+    --bg: #0a0e14;
+    --surface: #1a1f2e;
+    --surface-subtle: #252d3d;
+    --border: #3d4556;
+    --text: #f0f2f5;
+    --text-secondary: #a8adb8;
+    --accent: #6b81ff;
+    --accent-subtle: #1f2d55;
+    --danger: #ff6b6b;
     
     /* Spacing (8pt system) */
     --sp-4: 4px;
@@ -53,6 +53,8 @@ html, body {
     font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: var(--text-base);
     line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -66,6 +68,12 @@ a {
 
 button, input, select {
     font: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+button {
+    user-select: none;
 }
 
 .app-shell {
@@ -77,17 +85,20 @@ button, input, select {
 .sidebar {
     width: 280px;
     flex: 0 0 280px;
-    background: linear-gradient(180deg, #141824, #11141b);
+    background: linear-gradient(180deg, #0d1117, #0a0e14);
     border-right: 1px solid var(--border);
-    padding: var(--sp-16);
+    padding: var(--sp-20);
     box-sizing: border-box;
     position: sticky;
     top: 0;
     height: 100vh;
+    overflow-y: auto;
 }
 
 .sidebar-header {
-    padding-bottom: var(--sp-16);
+    padding-bottom: var(--sp-20);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--sp-20);
 }
 
 .brand-mark {
@@ -124,20 +135,27 @@ button, input, select {
 .nav-menu {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-8);
+    gap: var(--sp-4);
 }
 
 .nav-item {
     padding: var(--sp-12) var(--sp-16);
     border-radius: 12px;
     font-weight: var(--font-bold);
-    color: var(--text);
+    color: var(--text-secondary);
     font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.nav-item:hover {
+    background: rgba(107, 129, 255, 0.08);
+    color: var(--text);
 }
 
 .nav-item.active {
-    background: var(--surface-subtle);
-    color: #fff;
+    background: var(--accent-subtle);
+    color: var(--accent);
 }
 
 .main-column {
@@ -187,18 +205,28 @@ button, input, select {
     background: transparent;
     color: var(--text);
     font-size: var(--text-2xl);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button:hover {
+    background: var(--surface-subtle);
+    color: var(--accent);
 }
 
 .content {
-    padding: var(--sp-16) var(--sp-16) var(--sp-28);
+    padding: var(--sp-20) var(--sp-16) calc(96px + env(safe-area-inset-bottom));
     box-sizing: border-box;
+    background: var(--bg);
 }
 
 .page-stack {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-16);
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+    gap: var(--sp-20);
+    padding-bottom: 0;
     max-width: 760px;
     margin: 0 auto;
 }
@@ -213,8 +241,13 @@ button, input, select {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: var(--sp-16);
+    padding: var(--sp-20);
     box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: #4d5668;
 }
 
 .controls-card,
@@ -224,8 +257,9 @@ button, input, select {
 }
 
 .accent-card {
-    background: linear-gradient(180deg, #5b7cfa, #425de4);
+    background: linear-gradient(135deg, #6b81ff, #5568e0);
     border-color: transparent;
+    box-shadow: 0 8px 24px rgba(107, 129, 255, 0.25);
 }
 
 .accent-card .muted,
@@ -269,11 +303,16 @@ button, input, select {
     color: var(--text);
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
+    transition: all 0.15s ease;
 }
 
 .segment.active {
     background: var(--accent);
     color: white;
+}
+
+.segment:hover {
+    background: #303a50;
 }
 
 .button-primary,
@@ -284,6 +323,7 @@ button, input, select {
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
     cursor: pointer;
+    transition: all 0.15s ease;
 }
 
 .button-primary {
@@ -291,20 +331,39 @@ button, input, select {
     color: #fff;
 }
 
+.button-primary:hover {
+    background: #5865d8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(107, 129, 255, 0.3);
+}
+
+.button-primary:active {
+    transform: translateY(0);
+}
+
 .button-secondary {
     background: transparent;
     color: var(--text);
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
+}
+
+.button-secondary:hover {
+    background: var(--surface-subtle);
+    border-color: #4d5668;
 }
 
 .button-tonal {
     background: var(--accent-subtle);
-    color: #cfe0ff;
+    color: #9db4ff;
 }
 
 .button-tonal.active {
     background: var(--accent);
     color: #fff;
+}
+
+.button-tonal:hover {
+    background: #2a3a6a;
 }
 
 .button-tonal.icon {
@@ -332,8 +391,18 @@ button, input, select {
     color: white;
     font-size: 32px;
     font-weight: var(--font-black);
-    box-shadow: 0 10px 28px rgba(91, 124, 250, 0.32);
+    box-shadow: 0 12px 32px rgba(107, 129, 255, 0.35);
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fab:hover {
+    box-shadow: 0 16px 40px rgba(107, 129, 255, 0.42);
+    transform: scale(1.08);
+}
+
+.fab:active {
+    transform: scale(0.96);
 }
 
 .schedule-card {
@@ -342,6 +411,12 @@ button, input, select {
     gap: var(--sp-12);
     align-items: center;
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.schedule-card:hover {
+    border-color: #4d5668;
+    background: #1f2533;
 }
 
 .schedule-content {
@@ -387,6 +462,7 @@ button, input, select {
     color: #fff;
     font-size: var(--text-xs);
     font-weight: var(--font-bold);
+    gap: var(--sp-4);
 }
 
 .badge.prep,
@@ -420,6 +496,16 @@ button, input, select {
     padding: 0 var(--sp-12);
     font-size: var(--text-xs);
     font-weight: var(--font-bold);
+    transition: all 0.15s ease;
+}
+
+.card-delete:hover {
+    background: #ff5252;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.card-delete:active {
+    transform: scale(0.96);
 }
 
 .calendar-toolbar {
@@ -449,7 +535,7 @@ button, input, select {
 
 .calendar-day {
     min-height: 44px;
-    background: #151923;
+    background: #0f1420;
     color: var(--text);
     display: flex;
     flex-direction: column;
@@ -460,6 +546,11 @@ button, input, select {
     font-size: var(--text-sm);
     font-weight: var(--font-bold);
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.calendar-day:hover {
+    background: var(--surface-subtle);
 }
 
 .calendar-day.dimmed {
@@ -467,8 +558,9 @@ button, input, select {
 }
 
 .calendar-day.selected {
-    background: var(--accent-subtle);
-    outline: 2px solid rgba(91, 124, 250, 0.35);
+    background: var(--accent);
+    color: #fff;
+    outline: none;
 }
 
 .day-dot {
@@ -492,6 +584,15 @@ button, input, select {
     padding: var(--sp-12) 0;
     border-bottom: 1px solid var(--border);
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mini-row:hover {
+    color: var(--accent);
+}
+
+.mini-row:hover .mini-row-title {
+    color: var(--accent);
 }
 
 .mini-row:last-child {
@@ -541,6 +642,11 @@ button, input, select {
     outline: none;
     min-width: 0;
     font-size: var(--text-base);
+    transition: all 0.15s ease;
+}
+
+.place-input:focus {
+    color: var(--accent);
 }
 
 .place-results {
@@ -653,12 +759,24 @@ button, input, select {
     width: 100%;
     min-height: 44px;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    background: #151923;
+    border: 1.5px solid var(--border);
+    background: #151a27;
     color: var(--text);
     padding: 0 var(--sp-16);
     box-sizing: border-box;
     font-size: var(--text-base);
+    transition: all 0.15s ease;
+}
+
+.form-input:hover {
+    border-color: #4d5668;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #1a1f2b;
+    box-shadow: 0 0 0 3px rgba(107, 129, 255, 0.1);
 }
 
 .form-input.large {
@@ -701,12 +819,13 @@ button, input, select {
 .recommend-slot {
     border-radius: 12px;
     padding: var(--sp-12);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(107, 129, 255, 0.08);
+    transition: all 0.15s ease;
 }
 
 .recommend-slot.late {
-    background: rgba(239, 68, 68, 0.2);
-    outline: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(255, 107, 107, 0.12);
+    outline: 1.5px solid rgba(255, 107, 107, 0.4);
 }
 
 .recommend-time {
@@ -764,12 +883,12 @@ button, input, select {
     appearance: none;
     width: 50px;
     height: 28px;
-    background: var(--surface-subtle);
+    background: #303a50;
     border: 1px solid var(--border);
     border-radius: 999px;
     cursor: pointer;
     position: relative;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
@@ -778,11 +897,12 @@ button, input, select {
     position: absolute;
     width: 24px;
     height: 24px;
-    background: var(--text);
+    background: #f0f2f5;
     border-radius: 999px;
     top: 1px;
     left: 1px;
-    transition: left 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .switch-input:checked {
@@ -876,7 +996,7 @@ button, input, select {
     }
 
     .content {
-        padding: var(--sp-12);
+        padding: var(--sp-16) var(--sp-16) calc(96px + env(safe-area-inset-bottom));
     }
 
     .topbar {
@@ -901,7 +1021,7 @@ button, input, select {
 
 @media (max-width: 640px) {
     .page-stack {
-        gap: var(--sp-12);
+        gap: var(--sp-16);
         max-width: none;
         margin: 0;
     }
