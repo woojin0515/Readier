@@ -86,9 +86,9 @@ button {
 .sidebar {
     width: 280px;
     flex: 0 0 280px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px);
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
     padding: var(--sp-20);
     box-sizing: border-box;
     position: sticky;
@@ -171,12 +171,13 @@ button {
     align-items: center;
     gap: var(--sp-12);
     padding: 0 var(--sp-16);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    background: rgba(245, 245, 247, 0.8);
-    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(245, 245, 247, 0.75);
+    backdrop-filter: blur(24px);
     position: sticky;
     top: 0;
     z-index: 10;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .topbar-title {
@@ -240,33 +241,38 @@ button {
 }
 
 .card {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
     padding: var(--sp-20);
     box-sizing: border-box;
     transition: all 0.2s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 .card:hover {
-    border-color: rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
 }
 
 .controls-card,
 .empty-card,
 .calendar-card {
     padding: var(--sp-16);
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .accent-card {
-    background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(0, 100, 200, 0.1));
-    backdrop-filter: blur(20px);
-    border-color: rgba(0, 122, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 122, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(0, 100, 200, 0.05));
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 122, 255, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 122, 255, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .accent-card .muted,
@@ -306,20 +312,23 @@ button {
 
 .segment {
     min-height: 44px;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(200, 210, 230, 0.35);
     color: var(--text);
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
     transition: all 0.15s ease;
+    border: 1px solid rgba(200, 210, 230, 0.3);
 }
 
 .segment.active {
     background: var(--accent);
     color: white;
+    border-color: var(--accent);
 }
 
 .segment:hover {
-    background: rgba(200, 210, 230, 0.6);
+    background: rgba(200, 210, 230, 0.5);
+    border-color: rgba(200, 210, 230, 0.4);
 }
 
 .button-primary,
@@ -770,9 +779,9 @@ button {
     width: 100%;
     min-height: 44px;
     border-radius: 12px;
-    border: 1.5px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(200, 210, 230, 0.6);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
     color: var(--text);
     padding: 0 var(--sp-16);
     box-sizing: border-box;
@@ -781,15 +790,15 @@ button {
 }
 
 .form-input:hover {
-    border-color: rgba(0, 0, 0, 0.12);
-    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(200, 210, 230, 0.8);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .form-input:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
 }
 
 .form-input.large {
@@ -832,16 +841,16 @@ button {
 .recommend-slot {
     border-radius: 12px;
     padding: var(--sp-12);
-    background: rgba(0, 122, 255, 0.08);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 122, 255, 0.15);
+    background: rgba(0, 122, 255, 0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 122, 255, 0.2);
     transition: all 0.15s ease;
 }
 
 .recommend-slot.late {
-    background: rgba(255, 59, 48, 0.08);
-    border: 1.5px solid rgba(255, 59, 48, 0.2);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 59, 48, 0.06);
+    border: 1.5px solid rgba(255, 59, 48, 0.25);
+    backdrop-filter: blur(16px);
 }
 
 .recommend-time {
