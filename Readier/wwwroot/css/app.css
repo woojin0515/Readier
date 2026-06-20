@@ -1,16 +1,17 @@
 :root {
-    color-scheme: dark;
+    color-scheme: light;
     
-    /* Color Palette */
-    --bg: #0a0e14;
-    --surface: #1a1f2e;
-    --surface-subtle: #252d3d;
-    --border: #3d4556;
-    --text: #f0f2f5;
-    --text-secondary: #a8adb8;
-    --accent: #6b81ff;
-    --accent-subtle: #1f2d55;
-    --danger: #ff6b6b;
+    /* Color Palette - Apple Light Mode */
+    --bg: #f5f5f7;
+    --bg-secondary: #ffffff;
+    --surface: rgba(255, 255, 255, 0.75);
+    --surface-subtle: rgba(255, 255, 255, 0.5);
+    --border: rgba(0, 0, 0, 0.06);
+    --text: #1d1d1f;
+    --text-secondary: #76767f;
+    --accent: #007AFF;
+    --accent-subtle: rgba(0, 122, 255, 0.1);
+    --danger: #FF3B30;
     
     /* Spacing (8pt system) */
     --sp-4: 4px;
@@ -85,9 +86,9 @@ button {
 .sidebar {
     width: 280px;
     flex: 0 0 280px;
-    background: rgba(13, 17, 23, 0.6);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(61, 69, 86, 0.4);
+    border-right: 1px solid var(--border);
     padding: var(--sp-20);
     box-sizing: border-box;
     position: sticky;
@@ -150,7 +151,7 @@ button {
 }
 
 .nav-item:hover {
-    background: rgba(107, 129, 255, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     color: var(--text);
 }
 
@@ -170,8 +171,8 @@ button {
     align-items: center;
     gap: var(--sp-12);
     padding: 0 var(--sp-16);
-    border-bottom: 1px solid rgba(61, 69, 86, 0.3);
-    background: rgba(15, 17, 21, 0.7);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(245, 245, 247, 0.8);
     backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
@@ -213,7 +214,7 @@ button {
 }
 
 .icon-button:hover {
-    background: var(--surface-subtle);
+    background: rgba(0, 122, 255, 0.08);
     color: var(--accent);
 }
 
@@ -239,9 +240,9 @@ button {
 }
 
 .card {
-    background: rgba(26, 31, 46, 0.6);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(61, 69, 86, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 16px;
     padding: var(--sp-20);
     box-sizing: border-box;
@@ -249,22 +250,23 @@ button {
 }
 
 .card:hover {
-    border-color: #4d5668;
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .controls-card,
 .empty-card,
 .calendar-card {
     padding: var(--sp-16);
-    background: rgba(26, 31, 46, 0.5);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(16px);
 }
 
 .accent-card {
-    background: linear-gradient(135deg, rgba(107, 129, 255, 0.25), rgba(85, 104, 224, 0.25));
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(0, 100, 200, 0.1));
     backdrop-filter: blur(20px);
-    border-color: rgba(107, 129, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(107, 129, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 122, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .accent-card .muted,
@@ -272,7 +274,7 @@ button {
 .accent-card h1,
 .accent-card h2,
 .accent-card .recommend-time {
-    color: #fff;
+    color: #0066cc;
 }
 
 .section-header {
@@ -304,7 +306,7 @@ button {
 
 .segment {
     min-height: 44px;
-    background: var(--surface-subtle);
+    background: rgba(255, 255, 255, 0.4);
     color: var(--text);
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
@@ -317,7 +319,7 @@ button {
 }
 
 .segment:hover {
-    background: #303a50;
+    background: rgba(200, 210, 230, 0.6);
 }
 
 .button-primary,
@@ -337,9 +339,9 @@ button {
 }
 
 .button-primary:hover {
-    background: #5865d8;
+    background: #0051cc;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(107, 129, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
 }
 
 .button-primary:active {
@@ -349,17 +351,17 @@ button {
 .button-secondary {
     background: transparent;
     color: var(--text);
-    border: 1.5px solid var(--border);
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
 }
 
 .button-secondary:hover {
-    background: var(--surface-subtle);
-    border-color: #4d5668;
+    background: rgba(200, 210, 230, 0.3);
+    border-color: rgba(0, 0, 0, 0.15);
 }
 
 .button-tonal {
-    background: var(--accent-subtle);
-    color: #9db4ff;
+    background: rgba(0, 122, 255, 0.12);
+    color: #0066cc;
 }
 
 .button-tonal.active {
@@ -368,7 +370,7 @@ button {
 }
 
 .button-tonal:hover {
-    background: #2a3a6a;
+    background: rgba(0, 122, 255, 0.2);
 }
 
 .button-tonal.icon {
@@ -396,13 +398,13 @@ button {
     color: white;
     font-size: 32px;
     font-weight: var(--font-black);
-    box-shadow: 0 12px 32px rgba(107, 129, 255, 0.35);
+    box-shadow: 0 12px 32px rgba(0, 122, 255, 0.35);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .fab:hover {
-    box-shadow: 0 16px 40px rgba(107, 129, 255, 0.42);
+    box-shadow: 0 16px 40px rgba(0, 122, 255, 0.35);
     transform: scale(1.08);
 }
 
@@ -420,8 +422,8 @@ button {
 }
 
 .schedule-card:hover {
-    border-color: #4d5668;
-    background: #1f2533;
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(200, 210, 230, 0.15);
 }
 
 .schedule-content {
@@ -481,7 +483,7 @@ button {
 
 .late-note {
     margin-top: var(--sp-8);
-    color: #fecaca;
+    color: #c41c00;
     font-size: var(--text-xs);
     font-weight: var(--font-bold);
 }
@@ -505,8 +507,8 @@ button {
 }
 
 .card-delete:hover {
-    background: #ff5252;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    background: #ff453a;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.25);
 }
 
 .card-delete:active {
@@ -540,7 +542,7 @@ button {
 
 .calendar-day {
     min-height: 44px;
-    background: rgba(15, 20, 32, 0.4);
+    background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(8px);
     color: var(--text);
     display: flex;
@@ -553,11 +555,11 @@ button {
     font-weight: var(--font-bold);
     cursor: pointer;
     transition: all 0.15s ease;
-    border: 1px solid rgba(61, 69, 86, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day:hover {
-    background: var(--surface-subtle);
+    background: rgba(200, 210, 230, 0.3);
 }
 
 .calendar-day.dimmed {
@@ -689,7 +691,7 @@ button {
 }
 
 .place-result:hover {
-    background: rgba(91, 124, 250, 0.12);
+    background: rgba(0, 122, 255, 0.08);
 }
 
 .place-result-title {
@@ -714,9 +716,9 @@ button {
 }
 
 .recent-place-card {
-    border: 1px solid rgba(61, 69, 86, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 12px;
-    background: rgba(15, 20, 32, 0.5);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(12px);
     padding: var(--sp-12);
     display: flex;
@@ -759,17 +761,17 @@ button {
     height: 280px;
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(11, 17, 32, 0.5);
+    background: rgba(200, 210, 230, 0.3);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(61, 69, 86, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .form-input {
     width: 100%;
     min-height: 44px;
     border-radius: 12px;
-    border: 1.5px solid rgba(61, 69, 86, 0.4);
-    background: rgba(21, 26, 39, 0.5);
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     color: var(--text);
     padding: 0 var(--sp-16);
@@ -779,14 +781,15 @@ button {
 }
 
 .form-input:hover {
-    border-color: #4d5668;
+    border-color: rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .form-input:focus {
     outline: none;
     border-color: var(--accent);
-    background: #1a1f2b;
-    box-shadow: 0 0 0 3px rgba(107, 129, 255, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .form-input.large {
@@ -829,15 +832,15 @@ button {
 .recommend-slot {
     border-radius: 12px;
     padding: var(--sp-12);
-    background: rgba(107, 129, 255, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(107, 129, 255, 0.2);
+    border: 1px solid rgba(0, 122, 255, 0.15);
     transition: all 0.15s ease;
 }
 
 .recommend-slot.late {
-    background: rgba(255, 107, 107, 0.1);
-    border: 1.5px solid rgba(255, 107, 107, 0.3);
+    background: rgba(255, 59, 48, 0.08);
+    border: 1.5px solid rgba(255, 59, 48, 0.2);
     backdrop-filter: blur(12px);
 }
 
@@ -850,7 +853,7 @@ button {
     margin-top: var(--sp-8);
     font-size: var(--text-xs);
     font-weight: var(--font-bold);
-    color: #fecaca;
+    color: #c41c00;
 }
 
 .hero-number {
@@ -867,13 +870,13 @@ button {
 }
 
 .status.error {
-    background: rgba(239, 68, 68, 0.15);
-    color: #fecaca;
+    background: rgba(255, 59, 48, 0.1);
+    color: #c41c00;
 }
 
 .status.info {
-    background: rgba(91, 124, 250, 0.12);
-    color: #cfe0ff;
+    background: rgba(0, 122, 255, 0.1);
+    color: #0066cc;
 }
 
 .action-row {
@@ -896,8 +899,8 @@ button {
     appearance: none;
     width: 50px;
     height: 28px;
-    background: #303a50;
-    border: 1px solid var(--border);
+    background: #e5e5e7;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 999px;
     cursor: pointer;
     position: relative;
@@ -910,12 +913,12 @@ button {
     position: absolute;
     width: 24px;
     height: 24px;
-    background: #f0f2f5;
+    background: #ffffff;
     border-radius: 999px;
     top: 1px;
     left: 1px;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .switch-input:checked {
@@ -961,7 +964,7 @@ button {
 }
 
 .next-summary-note {
-    color: #cfe0ff;
+    color: #0066cc;
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
 }
@@ -1005,7 +1008,7 @@ button {
         position: fixed;
         inset: 0;
         z-index: 20;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.3);
     }
 
     .content {
