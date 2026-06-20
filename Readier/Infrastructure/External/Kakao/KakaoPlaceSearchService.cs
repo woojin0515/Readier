@@ -93,7 +93,7 @@ public class KakaoPlaceSearchService : IPlaceSearchService
     private static HttpRequestMessage BuildRequest(string url)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoNativeAppKey}");
+        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoRestApiKey}");
         return request;
     }
 

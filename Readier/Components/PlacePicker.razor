@@ -1,0 +1,154 @@
+@using System.Threading
+
+<div class="place-picker">
+    <div class="place-picker-input card">
+        <span class="place-icon">📍</span>
+        <input class="form-input place-input"
+               placeholder="@Placeholder"
+               autocomplete="off"
+               spellcheck="false"
+               @bind="QueryText"
+               @bind:event="oninput" />
+        @if (_isSearching)
+        {
+            <span class="spinner"></span>
+        }
+    </div>
+
+    @if (HasResults)
+    {
+        <div class="place-results card">
+            <div class="place-results-title">검색 결과</div>
+            @foreach (var result in _results)
+            {
+                <button type="button" class="place-result" @onclick="() => SelectAsync(result)">
+                    <div class="place-result-title">@result.DisplayLine</div>
+                    <div class="place-result-subtitle">@result.SubLine</div>
+                </button>
+            }
+        </div>
+    }
+    else if (!IsCommittedSelection && !string.IsNullOrWhiteSpace(_queryText) && !_isSearching)
+    {
+        <div class="place-results card">
+            <div class="place-results-title">검색 결과</div>
+            <div class="place-empty">검색 결과가 없어요.</div>
+        </div>
+    }
+
+    @if (SelectedPlace is not null)
+    {
+        <div class="place-selected muted">
+            선택됨: @SelectedPlace.DisplayLine
+            @if (!string.IsNullOrWhiteSpace(SelectedPlace.Address))
+            {
+                <span> · @SelectedPlace.Address</span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Placeholder { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired] public IPlaceSearchService SearchService { get; set; } = default!;
+
+    [Parameter] public Place? SelectedPlace { get; set; }
+
+    [Parameter] public EventCallback<Place?> SelectedPlaceChanged { get; set; }
+
+    private string _queryText = string.Empty;
+    private string? _selectedSnapshot;
+    private IReadOnlyList<PlaceSearchResult> _results = Array.Empty<PlaceSearchResult>();
+    private bool _isSearching;
+    private CancellationTokenSource? _debounce;
+    private bool _suppressSearch;
+
+    private bool HasResults => _results.Count > 0;
+    private bool IsCommittedSelection
+        => SelectedPlace is not null
+           && string.Equals(_queryText, _selectedSnapshot, StringComparison.Ordinal);
+
+    private string QueryText
+    {
+        get => _queryText;
+        set
+        {
+            if (_queryText == value)
+                return;
+
+            _queryText = value ?? string.Empty;
+            if (_suppressSearch)
+                return;
+
+            _ = SearchAsync(_queryText);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        var snapshot = SelectedPlace?.DisplayLine;
+        if (snapshot != _selectedSnapshot)
+        {
+            _selectedSnapshot = snapshot;
+            _suppressSearch = true;
+            _queryText = snapshot ?? string.Empty;
+            _suppressSearch = false;
+        }
+    }
+
+    private async Task SearchAsync(string query)
+    {
+        _debounce?.Cancel();
+        _debounce = new CancellationTokenSource();
+        var token = _debounce.Token;
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            _results = Array.Empty<PlaceSearchResult>();
+            await SelectedPlaceChanged.InvokeAsync(null);
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        try
+        {
+            _isSearching = true;
+            await Task.Delay(300, token);
+            var results = await SearchService.SearchAsync(query, token);
+            if (token.IsCancellationRequested)
+                return;
+
+            _results = results;
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+        finally
+        {
+            _isSearching = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectAsync(PlaceSearchResult result)
+    {
+        _suppressSearch = true;
+        _queryText = result.DisplayLine;
+        _suppressSearch = false;
+        _selectedSnapshot = result.DisplayLine;
+        _results = Array.Empty<PlaceSearchResult>();
+
+        var place = new Place
+        {
+            Name = result.Name,
+            Address = string.IsNullOrWhiteSpace(result.RoadAddress) ? result.Address : result.RoadAddress,
+            Latitude = result.Latitude,
+            Longitude = result.Longitude
+        };
+
+        await SelectedPlaceChanged.InvokeAsync(place);
+    }
+}

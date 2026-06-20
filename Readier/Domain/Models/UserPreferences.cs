@@ -7,6 +7,10 @@ public class UserPreferences
     public NotificationPreferences Notification { get; set; } = new();
 
     public PreparationProfile PreparationProfile { get; set; } = new();
+
+    public TransportationMode PreferredTransportation { get; set; } = TransportationMode.PublicTransit;
+
+    public List<Place> RecentPlaces { get; set; } = new();
 }
 
 public class NotificationPreferences

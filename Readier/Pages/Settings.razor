@@ -1,0 +1,58 @@
+@page "/settings"
+@inject SettingsViewModel ViewModel
+
+<PageTitle>@ViewModel.Title</PageTitle>
+
+<div class="page-stack">
+    <section class="card">
+        <h1>알림 설정</h1>
+        <label class="switch-row">
+            <span>알림 사용</span>
+            <input type="checkbox" @bind="ViewModel.NotificationsEnabled" />
+        </label>
+        <p class="muted">끄면 일정 저장 시 준비/출발 알림이 예약되지 않습니다.</p>
+    </section>
+
+    <section class="card">
+        <h2>알림 디테일</h2>
+        <label>
+            <span>출발 전 추가 알림</span>
+            <select class="form-input" @bind="ViewModel.LeaveSoonReminderMinutes">
+                @foreach (var minute in ViewModel.ReminderMinuteOptions)
+                {
+                    <option value="@minute">@minute 분</option>
+                }
+            </select>
+        </label>
+        <p class="muted" style="font-size: var(--text-xs);">0분은 사용 안 함입니다. 5분 이상 설정하면 출발 전에 한 번 더 알려드려요.</p>
+
+        <div class="divider"></div>
+
+        <label>
+            <span>기본 미루기</span>
+            <select class="form-input" @bind="ViewModel.SnoozePresetMinutes">
+                @foreach (var minute in ViewModel.SnoozeMinuteOptions)
+                {
+                    <option value="@minute">@minute 분</option>
+                }
+            </select>
+        </label>
+
+        <label class="switch-row">
+            <span>부담 없는 알림 문구</span>
+            <input type="checkbox" class="switch-input" @bind="ViewModel.UseCalmReminderCopy" />
+        </label>
+    </section>
+
+    <section class="card">
+        <h2>iOS 확장 <span style="font-size: var(--text-xs); color: var(--text-secondary);">(향후 예정)</span></h2>
+        <p class="muted">Live Activities / Dynamic Island 지원은 2차 구현 예정입니다.</p>
+    </section>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+}

@@ -56,7 +56,7 @@ public class KakaoTravelTimeProvider : ITravelTimeProvider
         var url = $"{DirectionEndpoint}?origin={originParam}&destination={destParam}&priority=RECOMMEND";
 
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoNativeAppKey}");
+        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoRestApiKey}");
 
         try
         {

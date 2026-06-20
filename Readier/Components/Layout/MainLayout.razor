@@ -1,0 +1,43 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="app-shell">
+    <aside class="sidebar @(IsDrawerOpen ? "open" : string.Empty)">
+        <div class="sidebar-header">
+            <button type="button" class="brand-mark brand-link" @onclick="GoHome">Readier</button>
+            <div class="brand-subtitle">더 이상 늦지 않게</div>
+        </div>
+
+        <NavMenu OnNavigate="CloseDrawer" />
+    </aside>
+
+    <div class="backdrop @(IsDrawerOpen ? "show" : string.Empty)" @onclick="CloseDrawer"></div>
+
+    <div class="main-column">
+        <header class="topbar">
+            <button class="icon-button" type="button" @onclick="ToggleDrawer">☰</button>
+            <div>
+                <button type="button" class="topbar-title topbar-link" @onclick="GoHome">Readier</button>
+            </div>
+            <div class="topbar-spacer"></div>
+        </header>
+
+        <main class="content">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private bool IsDrawerOpen;
+
+    private void ToggleDrawer() => IsDrawerOpen = !IsDrawerOpen;
+
+    private void CloseDrawer() => IsDrawerOpen = false;
+
+    private void GoHome()
+    {
+        CloseDrawer();
+        Navigation.NavigateTo("/");
+    }
+}

@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.Components;
 using Readier.Interfaces;
 using Readier.Models;
-using Readier.Views;
 
 namespace Readier.ViewModels;
 
@@ -17,6 +17,7 @@ public partial class ScheduleListViewModel : BaseViewModel
     private readonly IStorageService _storage;
     private readonly IScheduleNotificationService _notifications;
     private readonly ILeaveTimeCalculator _calculator;
+    private readonly NavigationManager _navigation;
     private List<ScheduleListItemViewModel> _allItems = new();
 
     public ObservableCollection<ScheduleListItemViewModel> VisibleItems { get; } = new();
@@ -30,6 +31,14 @@ public partial class ScheduleListViewModel : BaseViewModel
     private bool isEmpty;
 
     [ObservableProperty]
+    private bool showLateOnly;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasNextUpcoming))]
+    [NotifyPropertyChangedFor(nameof(NextUpcomingSummary))]
+    private ScheduleListItemViewModel? nextUpcomingItem;
+
+    [ObservableProperty]
     private string agendaTitle = "오늘 일정";
 
     [ObservableProperty]
@@ -40,16 +49,22 @@ public partial class ScheduleListViewModel : BaseViewModel
 
     public bool IsCalendarMode => !IsAgendaMode;
 
+    public bool HasNextUpcoming => NextUpcomingItem is not null;
+
+    public string NextUpcomingSummary => BuildNextUpcomingSummary(NextUpcomingItem);
+
     public string CalendarMonthTitle => CalendarMonth.ToString("yyyy년 M월", KoreanCulture);
 
     public ScheduleListViewModel(
         IStorageService storage,
         IScheduleNotificationService notifications,
-        ILeaveTimeCalculator calculator)
+        ILeaveTimeCalculator calculator,
+        NavigationManager navigation)
     {
         _storage = storage;
         _notifications = notifications;
         _calculator = calculator;
+        _navigation = navigation;
         Title = "일정";
     }
 
@@ -86,15 +101,25 @@ public partial class ScheduleListViewModel : BaseViewModel
         RebuildCalendarDays();
     }
 
+    partial void OnShowLateOnlyChanged(bool value)
+    {
+        RebuildVisibleItems();
+    }
+
     [RelayCommand]
     private Task AddAsync()
-        => Shell.Current.GoToAsync(nameof(ScheduleEditPage));
+    {
+        _navigation.NavigateTo("/schedules/edit");
+        return Task.CompletedTask;
+    }
 
     [RelayCommand]
     private Task EditAsync(ScheduleListItemViewModel? item)
-        => item is null
-            ? Task.CompletedTask
-            : Shell.Current.GoToAsync($"{nameof(ScheduleEditPage)}?id={item.Id}");
+    {
+        if (item is null) return Task.CompletedTask;
+        _navigation.NavigateTo($"/schedules/edit/{item.Id}");
+        return Task.CompletedTask;
+    }
 
     [RelayCommand]
     private async Task DeleteAsync(ScheduleListItemViewModel? item)
@@ -159,19 +184,26 @@ public partial class ScheduleListViewModel : BaseViewModel
 
         RebuildVisibleItems();
         RebuildCalendarDays();
+        NextUpcomingItem = _allItems.FirstOrDefault(i => i.StartTime >= DateTime.Now);
+
+        foreach (var item in list)
+        {
+            await _notifications.ScheduleAsync(item);
+        }
     }
 
     private void RebuildVisibleItems()
     {
         var filtered = _allItems
             .Where(i => i.StartTime.Date == SelectedDate.Date)
+            .Where(i => !ShowLateOnly || i.IsLeaveLate || i.IsStartPrepLate)
             .OrderBy(i => i.StartTime)
             .ToList();
 
         VisibleItems.Clear();
         foreach (var item in filtered) VisibleItems.Add(item);
 
-        AgendaTitle = FormatAgendaTitle(SelectedDate);
+        AgendaTitle = FormatAgendaTitle(SelectedDate, ShowLateOnly);
         IsEmpty = VisibleItems.Count == 0;
     }
 
@@ -192,12 +224,42 @@ public partial class ScheduleListViewModel : BaseViewModel
         }
     }
 
-    private static string FormatAgendaTitle(DateTime date)
+    private static string FormatAgendaTitle(DateTime date, bool lateOnly)
     {
         var today = DateTime.Today;
-        if (date == today) return "오늘 일정";
-        if (date == today.AddDays(1)) return "내일 일정";
-        if (date == today.AddDays(-1)) return "어제 일정";
-        return date.ToString("M월 d일 (ddd) 일정", KoreanCulture);
+        var suffix = lateOnly ? " · 늦은 일정만" : string.Empty;
+        if (date == today) return $"오늘 일정{suffix}";
+        if (date == today.AddDays(1)) return $"내일 일정{suffix}";
+        if (date == today.AddDays(-1)) return $"어제 일정{suffix}";
+        return $"{date.ToString("M월 d일 (ddd) 일정", KoreanCulture)}{suffix}";
+    }
+
+    private static string BuildNextUpcomingSummary(ScheduleListItemViewModel? item)
+    {
+        if (item is null)
+            return string.Empty;
+
+        var now = DateTime.Now;
+        var target = item.StartPrepAt > now
+            ? item.StartPrepAt
+            : item.LeaveAt > now
+                ? item.LeaveAt
+                : item.StartTime;
+
+        var remaining = target - now;
+        if (remaining < TimeSpan.Zero)
+            remaining = TimeSpan.Zero;
+
+        var countdown = remaining.TotalHours >= 1
+            ? $"{(int)remaining.TotalHours}시간 {remaining.Minutes}분"
+            : $"{Math.Max(1, (int)Math.Ceiling(remaining.TotalMinutes))}분";
+
+        if (item.StartPrepAt > now)
+            return $"준비 시작까지 {countdown}";
+
+        if (item.LeaveAt > now)
+            return $"출발까지 {countdown}";
+
+        return "이미 지난 일정이에요";
     }
 }

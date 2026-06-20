@@ -1,0 +1,219 @@
+@page "/"
+@page "/schedules"
+@inject ScheduleListViewModel ViewModel
+
+<PageTitle>일정</PageTitle>
+
+<div class="page-stack">
+    <section class="card controls-card">
+        <div class="segmented">
+            <button type="button" class="segment @(ViewModel.IsAgendaMode ? "active" : string.Empty)" @onclick="ShowAgendaAsync">오늘 아젠다</button>
+            <button type="button" class="segment @(!ViewModel.IsAgendaMode ? "active" : string.Empty)" @onclick="ShowCalendarAsync">캘린더 탐색</button>
+        </div>
+    </section>
+
+    @if (ViewModel.IsAgendaMode && ViewModel.HasNextUpcoming)
+    {
+        <section class="card next-summary-card">
+            <div class="muted">다음 일정</div>
+            <div class="next-summary-title">@ViewModel.NextUpcomingItem!.Title</div>
+            @if (ViewModel.NextUpcomingItem!.HasDestination)
+            {
+                <div class="next-summary-meta">
+                    <span class="icon">📍</span>
+                    <span>@ViewModel.NextUpcomingItem!.DestinationLabel</span>
+                </div>
+            }
+            <div class="next-summary-meta">
+                <span class="icon">🕐</span>
+                <span>@ViewModel.NextUpcomingItem!.StartTime.ToString("HH:mm")</span>
+            </div>
+        </section>
+    }
+
+    @if (ViewModel.IsAgendaMode)
+    {
+        <section class="section-header">
+            <div>
+                <h1>@ViewModel.AgendaTitle</h1>
+                <p class="muted">준비 시작/출발 시각을 확인하고 일정을 준비하세요.</p>
+            </div>
+            <div class="agenda-quick-nav" role="group" aria-label="아젠다 날짜 선택">
+                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today ? "active" : string.Empty)" @onclick="GoToTodayAsync">오늘</button>
+                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today.AddDays(1) ? "active" : string.Empty)" @onclick="GoToTomorrowAsync">내일</button>
+                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today.AddDays(2) ? "active" : string.Empty)" @onclick="GoToDayAfterTomorrowAsync">모레</button>
+            </div>
+        </section>
+
+        @if (ViewModel.VisibleItems.Count == 0)
+        {
+            <section class="card empty-card">
+                <h2>@(ViewModel.ShowLateOnly ? "늦은 일정이 없어요" : "오늘 일정이 없어요")</h2>
+                <p class="muted">@(ViewModel.ShowLateOnly ? "예정된 일정을 모두 정시에 준비하고 계세요." : "우측 하단 + 버튼으로 첫 일정을 추가하세요. 준비/출발 시각을 자동 계산해 드려요.")</p>
+            </section>
+        }
+        else
+        {
+            <div class="stack">
+                @foreach (var item in ViewModel.VisibleItems)
+                {
+                    <article class="card schedule-card @(item.IsLeaveLate ? "late" : string.Empty)" @onclick="() => EditAsync(item)">
+                        <div class="time-column">@item.StartTime.ToString("HH:mm")</div>
+                        <div class="accent-bar"></div>
+                        <div class="schedule-content">
+                            <div class="schedule-title">@item.Title</div>
+                            @if (item.HasDestination)
+                            {
+                                <div class="schedule-subtitle">@item.DestinationLabel</div>
+                            }
+                            <div class="badge-row">
+                                <span class="badge prep">준비 <strong>@item.DisplayStartPrepAt.ToString("HH:mm")</strong></span>
+                                <span class="badge leave">출발 <strong>@item.DisplayLeaveAt.ToString("HH:mm")</strong></span>
+                            </div>
+                            @if (item.IsLeaveLate)
+                            {
+                                <div class="late-note">⚠️ 이미 늦었어요</div>
+                            }
+                        </div>
+                        <button type="button" class="card-delete" @onclick:stopPropagation="true" @onclick="() => DeleteAsync(item)">삭제</button>
+                    </article>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <section class="card calendar-card">
+            <div class="calendar-toolbar">
+                <button type="button" class="button-tonal icon" @onclick="PreviousMonthAsync">◀</button>
+                <h1>@ViewModel.CalendarMonthTitle</h1>
+                <button type="button" class="button-tonal icon" @onclick="NextMonthAsync">▶</button>
+            </div>
+
+            <div class="weekday-row">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+            </div>
+
+            <div class="calendar-grid">
+                @foreach (var day in ViewModel.CalendarDays)
+                {
+                    <button type="button" class="calendar-day @(day.IsCurrentMonth ? string.Empty : "dimmed") @(day.IsSelected ? "selected" : string.Empty)" @onclick="() => SelectDateAsync(day.Date)">
+                        <span>@day.DayLabel</span>
+                        @if (day.HasItems)
+                        {
+                            <span class="day-dot"></span>
+                        }
+                    </button>
+                }
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>@ViewModel.AgendaTitle</h2>
+            @if (ViewModel.VisibleItems.Count == 0)
+            {
+                <p class="muted">선택한 날짜에 일정이 없어요.</p>
+            }
+            else
+            {
+                <div class="mini-list">
+                    @foreach (var item in ViewModel.VisibleItems)
+                    {
+                        <div class="mini-row" @onclick="() => EditAsync(item)">
+                            <span>@item.StartTime.ToString("HH:mm")</span>
+                            <div class="mini-row-content">
+                                <div class="mini-row-title">@item.Title</div>
+                                @if (item.HasDestination)
+                                {
+                                    <div class="mini-row-subtitle">@item.DestinationLabel</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+    <button type="button" class="fab" @onclick="AddAsync">+</button>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
+    private async Task ShowAgendaAsync()
+    {
+        ViewModel.ShowAgendaCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ShowCalendarAsync()
+    {
+        ViewModel.ShowCalendarCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GoToTodayAsync()
+    {
+        ViewModel.GoToTodayCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GoToTomorrowAsync()
+    {
+        ViewModel.SelectDateCommand.Execute(DateTime.Today.AddDays(1));
+        ViewModel.ShowAgendaCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GoToDayAfterTomorrowAsync()
+    {
+        ViewModel.SelectDateCommand.Execute(DateTime.Today.AddDays(2));
+        ViewModel.ShowAgendaCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ToggleLateOnlyAsync()
+    {
+        ViewModel.ShowLateOnly = !ViewModel.ShowLateOnly;
+        ViewModel.ShowAgendaCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task PreviousMonthAsync()
+    {
+        ViewModel.PreviousMonthCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task NextMonthAsync()
+    {
+        ViewModel.NextMonthCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectDateAsync(DateTime date)
+    {
+        ViewModel.SelectDateCommand.Execute(date);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AddAsync()
+    {
+        await ViewModel.AddCommand.ExecuteAsync(null);
+    }
+
+    private async Task EditAsync(ScheduleListItemViewModel item)
+    {
+        await ViewModel.EditCommand.ExecuteAsync(item);
+    }
+
+    private async Task DeleteAsync(ScheduleListItemViewModel item)
+    {
+        await ViewModel.DeleteCommand.ExecuteAsync(item);
+        await InvokeAsync(StateHasChanged);
+    }
+}

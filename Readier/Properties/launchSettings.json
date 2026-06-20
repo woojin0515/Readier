@@ -1,8 +1,10 @@
 {
   "profiles": {
-    "Windows Machine": {
+    "Readier": {
       "commandName": "Project",
-      "nativeDebugging": false
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5237;https://localhost:7237"
     }
   }
 }

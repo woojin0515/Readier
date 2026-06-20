@@ -1,0 +1,167 @@
+@page "/schedules/edit"
+@page "/schedules/edit/{Id:guid}"
+@inject ScheduleEditViewModel ViewModel
+
+<PageTitle>@ViewModel.Title</PageTitle>
+
+<div class="page-stack">
+    <section class="card">
+        <h1>일정 제목</h1>
+        <input class="form-input large" placeholder="예: 회의, 약속" @bind="ViewModel.ScheduleTitle" />
+    </section>
+
+    <section class="card">
+        <h2>출발지 & 목적지</h2>
+        <PlacePicker Placeholder="출발지" SearchService="ViewModel.PlaceSearch" @bind-SelectedPlace="ViewModel.OriginPlace" />
+        <div class="spacer"></div>
+        <PlacePicker Placeholder="목적지" SearchService="ViewModel.PlaceSearch" @bind-SelectedPlace="ViewModel.DestinationPlace" />
+
+        @if (ViewModel.RecentPlaces.Count > 0)
+        {
+            <div class="divider"></div>
+            <div class="recent-places">
+                <div class="muted" style="font-size: var(--text-xs); font-weight: var(--font-bold);">최근 장소</div>
+                <div class="recent-place-grid">
+                    @foreach (var place in ViewModel.RecentPlaces)
+                    {
+                        <article class="recent-place-card">
+                            <div class="recent-place-title">@place.DisplayLine</div>
+                            @if (!string.IsNullOrWhiteSpace(place.Address))
+                            {
+                                <div class="recent-place-subtitle">@place.Address</div>
+                            }
+                            <div class="recent-place-actions">
+                                <button type="button" class="button-secondary small" @onclick="() => ViewModel.UseRecentOriginCommand.Execute(place)">출발지</button>
+                                <button type="button" class="button-secondary small" @onclick="() => ViewModel.UseRecentDestinationCommand.Execute(place)">목적지</button>
+                            </div>
+                        </article>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+    <MapPreview Origin="ViewModel.OriginPlace" Destination="ViewModel.DestinationPlace" />
+
+    <section class="card">
+        <h2>일정 시각 & 이동 수단</h2>
+        <div class="form-grid">
+            <label>
+                <span>날짜</span>
+                <input class="form-input" type="date" @bind="ViewModel.StartDate" />
+            </label>
+            <label>
+                <span>시작 시간</span>
+                <input class="form-input" type="time" @bind="ViewModel.StartTime" />
+            </label>
+        </div>
+        <div class="spacer"></div>
+        <label>
+            <span>이동 수단</span>
+            <select class="form-input" value="@_selectedMode.ToString()" @onchange="OnTransportationChanged">
+                @foreach (var option in ViewModel.TransportationOptions)
+                {
+                    <option value="@option.Mode.ToString()">@option.Label</option>
+                }
+            </select>
+        </label>
+    </section>
+
+    <section class="card">
+        <h2>이동 & 준비 시간</h2>
+        <div class="form-grid">
+            <label>
+                <span>이동 시간 (분)</span>
+                <input class="form-input" type="number" min="0" step="1" @bind="ViewModel.TravelMinutes" placeholder="0" />
+            </label>
+            <label>
+                <span>준비 시간 (분)</span>
+                <input class="form-input" type="number" min="0" step="1" @bind="ViewModel.PrepMinutes" placeholder="0" />
+            </label>
+        </div>
+        <button type="button" class="button-tonal full" @onclick="CalculateTravelAsync" disabled="@ViewModel.IsCalculating" style="margin-top: var(--sp-12);">
+            @if (ViewModel.IsCalculating)
+            {
+                <span>계산 중...</span>
+            }
+            else
+            {
+                <span>이동 시간 자동 계산</span>
+            }
+        </button>
+        <p class="muted" style="font-size: var(--text-xs); margin-top: var(--sp-12); margin-bottom: 0;">자동 계산이 실패해도 직접 입력할 수 있습니다.</p>
+    </section>
+
+    <section class="card accent-card">
+        <h2>추천 시각</h2>
+        <div class="recommend-grid">
+            <div class="recommend-slot @(ViewModel.IsStartPrepLate ? "late" : string.Empty)">
+                <div class="muted">준비 시작</div>
+                <div class="recommend-time">@ViewModel.DisplayStartPrepAt.ToString("HH:mm")</div>
+                @if (ViewModel.IsStartPrepLate)
+                {
+                    <div class="recommend-subtitle">이미 지났어요</div>
+                }
+            </div>
+            <div class="recommend-slot @(ViewModel.IsLeaveLate ? "late" : string.Empty)">
+                <div class="muted">출발</div>
+                <div class="recommend-time">@ViewModel.DisplayLeaveAt.ToString("HH:mm")</div>
+                @if (ViewModel.IsLeaveLate)
+                {
+                    <div class="recommend-subtitle">이미 지났어요</div>
+                }
+            </div>
+        </div>
+    </section>
+
+    @if (ViewModel.HasError)
+    {
+        <div class="status error">@ViewModel.StatusMessage</div>
+    }
+    @if (ViewModel.HasInfo)
+    {
+        <div class="status info">@ViewModel.StatusMessage</div>
+    }
+
+    <div class="action-row">
+        <button type="button" class="button-secondary" @onclick="CancelAsync">취소</button>
+        <button type="button" class="button-primary" @onclick="SaveAsync">저장</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private TransportationMode _selectedMode = TransportationMode.PublicTransit;
+    private string? _loadedId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var currentId = Id?.ToString();
+        if (currentId == _loadedId)
+            return;
+
+        _loadedId = currentId;
+        await ViewModel.LoadAsync(currentId);
+        _selectedMode = ViewModel.TransportationOption?.Mode ?? TransportationMode.PublicTransit;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task CalculateTravelAsync()
+        => ViewModel.CalculateTravelTimeCommand.ExecuteAsync(null);
+
+    private Task SaveAsync()
+        => ViewModel.SaveCommand.ExecuteAsync(null);
+
+    private Task CancelAsync()
+        => ViewModel.CancelCommand.ExecuteAsync(null);
+
+    private void OnTransportationChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<TransportationMode>(args.Value?.ToString(), out var mode))
+        {
+            _selectedMode = mode;
+            ViewModel.TransportationOption = TransportationCatalog.FromMode(mode);
+        }
+    }
+}

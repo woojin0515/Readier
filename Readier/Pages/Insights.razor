@@ -1,0 +1,53 @@
+@page "/insights"
+@inject BehaviorAnalysisViewModel ViewModel
+
+<PageTitle>@ViewModel.Title</PageTitle>
+
+<div class="page-stack">
+    <section class="card accent-card">
+        <h1>추정 준비 시간</h1>
+        <div class="hero-number">약 @ViewModel.EstimatedPrepMinutes 분</div>
+        <p class="muted light">평소 루틴에 가장 가까운 항목을 골라 주세요. 새 일정을 만들 때 기본 준비 시간으로 자동 반영됩니다.</p>
+    </section>
+
+    @if (ViewModel.Questions.Count > 0)
+    {
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-8);">
+            <h2 style="margin: 0; font-size: var(--text-lg);">당신의 루틴</h2>
+            <span class="muted" style="font-size: var(--text-xs);">@ViewModel.Questions.Count(q => q.SelectedIndex >= 0) / @ViewModel.Questions.Count</span>
+        </div>
+    }
+
+    <section class="stack">
+        @foreach (var question in ViewModel.Questions)
+        {
+            <article class="card">
+                <h2>@question.QuestionTitle</h2>
+                <select class="form-input" @bind="question.SelectedIndex">
+                    @for (var i = 0; i < question.OptionLabels.Count; i++)
+                    {
+                        <option value="@i">@question.OptionLabels[i]</option>
+                    }
+                </select>
+            </article>
+        }
+    </section>
+
+    @if (ViewModel.Questions.Count > 0)
+    {
+        <button type="button" class="button-primary full" @onclick="SaveAsync">저장하기</button>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await ViewModel.SaveAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+}

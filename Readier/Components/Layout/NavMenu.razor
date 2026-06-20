@@ -1,0 +1,9 @@
+<nav class="nav-menu">
+    <NavLink href="/" Match="NavLinkMatch.All" class="nav-item" @onclick="OnNavigate">일정</NavLink>
+    <NavLink href="/insights" class="nav-item" @onclick="OnNavigate">분석</NavLink>
+    <NavLink href="/settings" class="nav-item" @onclick="OnNavigate">설정</NavLink>
+</nav>
+
+@code {
+    [Parameter] public EventCallback OnNavigate { get; set; }
+}

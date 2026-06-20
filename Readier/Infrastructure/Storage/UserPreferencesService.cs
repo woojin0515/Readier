@@ -10,6 +10,8 @@ public class UserPreferencesService : IUserPreferencesService
     private readonly IStorageService _storage;
     private UserPreferences? _cached;
 
+    public event EventHandler? PreferencesChanged;
+
     public UserPreferencesService(IStorageService storage)
     {
         _storage = storage;
@@ -26,5 +28,6 @@ public class UserPreferencesService : IUserPreferencesService
     {
         _cached = preferences;
         await _storage.SetAsync(StorageKey, preferences);
+        PreferencesChanged?.Invoke(this, EventArgs.Empty);
     }
 }

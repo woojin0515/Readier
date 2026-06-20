@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Readier.Helpers;
 using Readier.Interfaces;
@@ -11,6 +12,7 @@ public partial class BehaviorAnalysisViewModel : BaseViewModel
 {
     private readonly IUserPreferencesService _preferences;
     private bool _isLoading = true;
+    private CancellationTokenSource? _saveDebounce;
 
     public ObservableCollection<SurveyQuestionViewModel> Questions { get; } = new();
 
@@ -55,7 +57,7 @@ public partial class BehaviorAnalysisViewModel : BaseViewModel
         if (e.PropertyName != nameof(SurveyQuestionViewModel.SelectedIndex)) return;
         UpdateTotal();
         if (_isLoading) return;
-        await SaveAsync();
+        QueueSave();
     }
 
     private void UpdateTotal()
@@ -63,11 +65,31 @@ public partial class BehaviorAnalysisViewModel : BaseViewModel
         EstimatedPrepMinutes = PreparationSurvey.TotalMinutes(SnapshotAnswers());
     }
 
-    private async Task SaveAsync()
+    public async Task SaveAsync()
     {
         var prefs = await _preferences.GetAsync();
         prefs.PreparationProfile = new PreparationProfile { Answers = SnapshotAnswers() };
         await _preferences.SaveAsync(prefs);
+    }
+
+    private void QueueSave()
+    {
+        _saveDebounce?.Cancel();
+        _saveDebounce = new CancellationTokenSource();
+        var token = _saveDebounce.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(250, token);
+                if (token.IsCancellationRequested) return;
+                await SaveAsync();
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        });
     }
 
     private Dictionary<string, int> SnapshotAnswers()

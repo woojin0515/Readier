@@ -1,4 +1,4 @@
-using Plugin.LocalNotification;
+using Microsoft.JSInterop;
 using Readier.Interfaces;
 using Readier.Models;
 
@@ -6,11 +6,13 @@ namespace Readier.Services;
 
 public class LocalNotificationService : IScheduleNotificationService
 {
+    private readonly IJSRuntime _js;
     private readonly ILeaveTimeCalculator _calculator;
     private readonly IUserPreferencesService _preferences;
 
-    public LocalNotificationService(ILeaveTimeCalculator calculator, IUserPreferencesService preferences)
+    public LocalNotificationService(IJSRuntime js, ILeaveTimeCalculator calculator, IUserPreferencesService preferences)
     {
+        _js = js;
         _calculator = calculator;
         _preferences = preferences;
     }
@@ -38,24 +40,12 @@ public class LocalNotificationService : IScheduleNotificationService
 
         if (plan.StartPrepAt > now)
         {
-            await LocalNotificationCenter.Current.Show(new NotificationRequest
-            {
-                NotificationId = PrepId(schedule.Id),
-                Title = prepTitle,
-                Description = description,
-                Schedule = new NotificationRequestSchedule { NotifyTime = plan.StartPrepAt }
-            });
+            await ScheduleBrowserNotificationAsync(PrepId(schedule.Id), prepTitle, description, plan.StartPrepAt);
         }
 
         if (plan.LeaveAt > now)
         {
-            await LocalNotificationCenter.Current.Show(new NotificationRequest
-            {
-                NotificationId = LeaveId(schedule.Id),
-                Title = leaveTitle,
-                Description = description,
-                Schedule = new NotificationRequestSchedule { NotifyTime = plan.LeaveAt }
-            });
+            await ScheduleBrowserNotificationAsync(LeaveId(schedule.Id), leaveTitle, description, plan.LeaveAt);
         }
 
         if (prefs.Notification.LeaveSoonReminderMinutes > 0)
@@ -63,31 +53,31 @@ public class LocalNotificationService : IScheduleNotificationService
             var beforeLeave = plan.LeaveAt.AddMinutes(-prefs.Notification.LeaveSoonReminderMinutes);
             if (beforeLeave > now && beforeLeave < plan.LeaveAt)
             {
-                await LocalNotificationCenter.Current.Show(new NotificationRequest
-                {
-                    NotificationId = LeaveSoonId(schedule.Id),
-                    Title = $"출발 {prefs.Notification.LeaveSoonReminderMinutes}분 전",
-                    Description = description,
-                    Schedule = new NotificationRequestSchedule { NotifyTime = beforeLeave }
-                });
+                await ScheduleBrowserNotificationAsync(
+                    LeaveSoonId(schedule.Id),
+                    $"출발 {prefs.Notification.LeaveSoonReminderMinutes}분 전",
+                    description,
+                    beforeLeave);
             }
         }
     }
 
     public Task CancelAsync(Guid scheduleId)
     {
-        LocalNotificationCenter.Current.Cancel(PrepId(scheduleId));
-        LocalNotificationCenter.Current.Cancel(LeaveId(scheduleId));
-        LocalNotificationCenter.Current.Cancel(LeaveSoonId(scheduleId));
-        return Task.CompletedTask;
+        return _js.InvokeVoidAsync(
+            "readierNotifications.cancelGroup",
+            PrepId(scheduleId),
+            LeaveId(scheduleId),
+            LeaveSoonId(scheduleId)).AsTask();
     }
 
-    private static async Task<bool> EnsurePermissionAsync()
+    private async Task<bool> EnsurePermissionAsync()
     {
-        if (await LocalNotificationCenter.Current.AreNotificationsEnabled())
-            return true;
-        return await LocalNotificationCenter.Current.RequestNotificationPermission();
+        return await _js.InvokeAsync<bool>("readierNotifications.isEnabled");
     }
+
+    private Task ScheduleBrowserNotificationAsync(int id, string title, string description, DateTime notifyTime)
+        => _js.InvokeVoidAsync("readierNotifications.schedule", id, title, description, notifyTime).AsTask();
 
     private static int PrepId(Guid id) => HashCode.Combine(id, "prep") & 0x7FFFFFFF;
 

@@ -1,0 +1,59 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<section class="card map-card">
+    <div class="map-copy">
+        <h2>지도 미리보기</h2>
+        <p class="muted">출발지와 목적지를 선택하면 위치를 바로 확인할 수 있어요.</p>
+    </div>
+    <div class="route-map" @ref="_mapElement"></div>
+</section>
+
+@code {
+    [Parameter] public Place? Origin { get; set; }
+    [Parameter] public Place? Destination { get; set; }
+
+    private ElementReference _mapElement;
+    private string? _lastRenderKey;
+
+    protected override void OnParametersSet()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var renderKey = BuildKey(Origin, Destination);
+        if (!firstRender && renderKey == _lastRenderKey)
+            return;
+
+        _lastRenderKey = renderKey;
+        await JS.InvokeVoidAsync("readierMap.render", _mapElement, ToPayload(Origin), ToPayload(Destination));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JS.InvokeVoidAsync("readierMap.destroy", _mapElement);
+    }
+
+    private static object? ToPayload(Place? place)
+    {
+        if (place is null || !place.HasCoordinates)
+            return null;
+
+        return new
+        {
+            label = place.DisplayLine,
+            address = place.Address,
+            latitude = place.Latitude,
+            longitude = place.Longitude
+        };
+    }
+
+    private static string BuildKey(Place? origin, Place? destination)
+        => $"{BuildPlaceKey(origin)}|{BuildPlaceKey(destination)}";
+
+    private static string BuildPlaceKey(Place? place)
+        => place is null || !place.HasCoordinates
+            ? string.Empty
+            : $"{place.Latitude:F6}:{place.Longitude:F6}:{place.DisplayLine}:{place.Address}";
+}
