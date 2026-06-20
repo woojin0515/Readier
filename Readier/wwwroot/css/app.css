@@ -280,7 +280,7 @@ button {
 .accent-card h1,
 .accent-card h2,
 .accent-card .recommend-time {
-    color: #0066cc;
+    color: #007AFF;
 }
 
 .section-header {
@@ -372,7 +372,7 @@ button {
 
 .button-tonal {
     background: rgba(0, 122, 255, 0.12);
-    color: #0066cc;
+    color: #007AFF;
 }
 
 .button-tonal.active {
@@ -887,7 +887,7 @@ button {
 
 .status.info {
     background: rgba(0, 122, 255, 0.1);
-    color: #0066cc;
+    color: #007AFF;
 }
 
 .action-row {
@@ -979,7 +979,7 @@ button {
 }
 
 .next-summary-note {
-    color: #0066cc;
+    color: #007AFF;
     font-weight: var(--font-bold);
     font-size: var(--text-sm);
 }
