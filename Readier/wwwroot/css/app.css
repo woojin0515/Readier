@@ -50,7 +50,7 @@ html, body {
     min-height: 100%;
     background: var(--bg);
     color: var(--text);
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
     font-size: var(--text-base);
     line-height: var(--leading-normal);
     -webkit-font-smoothing: antialiased;
@@ -85,8 +85,9 @@ button {
 .sidebar {
     width: 280px;
     flex: 0 0 280px;
-    background: linear-gradient(180deg, #0d1117, #0a0e14);
-    border-right: 1px solid var(--border);
+    background: rgba(13, 17, 23, 0.6);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(61, 69, 86, 0.4);
     padding: var(--sp-20);
     box-sizing: border-box;
     position: sticky;
@@ -169,12 +170,12 @@ button {
     align-items: center;
     gap: var(--sp-12);
     padding: 0 var(--sp-16);
-    border-bottom: 1px solid var(--border);
-    background: rgba(15, 17, 21, 0.92);
+    border-bottom: 1px solid rgba(61, 69, 86, 0.3);
+    background: rgba(15, 17, 21, 0.7);
+    backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(14px);
 }
 
 .topbar-title {
@@ -238,8 +239,9 @@ button {
 }
 
 .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: rgba(26, 31, 46, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(61, 69, 86, 0.5);
     border-radius: 16px;
     padding: var(--sp-20);
     box-sizing: border-box;
@@ -253,13 +255,16 @@ button {
 .controls-card,
 .empty-card,
 .calendar-card {
-    padding: var(--sp-12);
+    padding: var(--sp-16);
+    background: rgba(26, 31, 46, 0.5);
+    backdrop-filter: blur(16px);
 }
 
 .accent-card {
-    background: linear-gradient(135deg, #6b81ff, #5568e0);
-    border-color: transparent;
-    box-shadow: 0 8px 24px rgba(107, 129, 255, 0.25);
+    background: linear-gradient(135deg, rgba(107, 129, 255, 0.25), rgba(85, 104, 224, 0.25));
+    backdrop-filter: blur(20px);
+    border-color: rgba(107, 129, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(107, 129, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .accent-card .muted,
@@ -535,7 +540,8 @@ button {
 
 .calendar-day {
     min-height: 44px;
-    background: #0f1420;
+    background: rgba(15, 20, 32, 0.4);
+    backdrop-filter: blur(8px);
     color: var(--text);
     display: flex;
     flex-direction: column;
@@ -547,6 +553,7 @@ button {
     font-weight: var(--font-bold);
     cursor: pointer;
     transition: all 0.15s ease;
+    border: 1px solid rgba(61, 69, 86, 0.3);
 }
 
 .calendar-day:hover {
@@ -707,9 +714,10 @@ button {
 }
 
 .recent-place-card {
-    border: 1px solid var(--border);
+    border: 1px solid rgba(61, 69, 86, 0.4);
     border-radius: 12px;
-    background: #151923;
+    background: rgba(15, 20, 32, 0.5);
+    backdrop-filter: blur(12px);
     padding: var(--sp-12);
     display: flex;
     flex-direction: column;
@@ -751,16 +759,18 @@ button {
     height: 280px;
     border-radius: 12px;
     overflow: hidden;
-    background: #11141b;
-    border: 1px solid var(--border);
+    background: rgba(11, 17, 32, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(61, 69, 86, 0.3);
 }
 
 .form-input {
     width: 100%;
     min-height: 44px;
     border-radius: 12px;
-    border: 1.5px solid var(--border);
-    background: #151a27;
+    border: 1.5px solid rgba(61, 69, 86, 0.4);
+    background: rgba(21, 26, 39, 0.5);
+    backdrop-filter: blur(10px);
     color: var(--text);
     padding: 0 var(--sp-16);
     box-sizing: border-box;
@@ -820,12 +830,15 @@ button {
     border-radius: 12px;
     padding: var(--sp-12);
     background: rgba(107, 129, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(107, 129, 255, 0.2);
     transition: all 0.15s ease;
 }
 
 .recommend-slot.late {
-    background: rgba(255, 107, 107, 0.12);
-    outline: 1.5px solid rgba(255, 107, 107, 0.4);
+    background: rgba(255, 107, 107, 0.1);
+    border: 1.5px solid rgba(255, 107, 107, 0.3);
+    backdrop-filter: blur(12px);
 }
 
 .recommend-time {
