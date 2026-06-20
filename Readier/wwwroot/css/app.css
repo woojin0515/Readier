@@ -298,6 +298,8 @@ button {
     font-size: var(--text-2xl);
     font-weight: var(--font-black);
     line-height: var(--leading-tight);
+    outline: none;
+}
 }
 
 .card h2 {
@@ -902,6 +904,10 @@ button {
     align-items: center;
     gap: var(--sp-16);
     font-size: var(--text-sm);
+}
+
+.switch-row span {
+    text-align: left;
 }
 
 .switch-input {
