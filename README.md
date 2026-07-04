@@ -26,5 +26,11 @@ dotnet build Readier.sln
 dotnet run --project Readier/Readier.csproj
 ```
 
-앱에서 DB 저장을 사용하려면 환경 변수 `READIER_DB_CONNECTION`을 설정해야 하며,  
+앱에서 DB 저장을 사용하려면 아래 중 하나로 연결 문자열을 설정하면 됩니다.
+
+- `READIER_DB_CONNECTION` (권장)
+- `ConnectionStrings__ReadierDb`
+- Azure App Service Connection String 이름 `readierdb` (`SQLAZURECONNSTR_readierdb`/`SQLCONNSTR_readierdb`)
+
+  
 Kakao/Google 연동 기능은 관련 API 키/시크릿 환경 변수 설정이 필요합니다.

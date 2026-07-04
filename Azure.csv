@@ -1,0 +1,7 @@
+﻿이름,유형,위치,리소스 그룹,구독,마지막으로 액세스한 날짜,리소스 링크
+"readier-web-6245","App Service","Korea Central","readier-rg","유가중 최우진","10분 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0/resourceGroups/readier-rg/providers/Microsoft.Web/sites/readier-web-6245"
+"readier-sql-0627105449","SQL Server","Korea Central","readier-rg","유가중 최우진","13분 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0/resourceGroups/readier-rg/providers/Microsoft.Sql/servers/readier-sql-0627105449"
+"readier-rg","리소스 그룹","Korea Central","readier-rg","유가중 최우진","14분 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0/resourceGroups/readier-rg"
+"readierdb(readier-sql-0627105449/readierdb)","SQL 데이터베이스","Korea Central","readier-rg","유가중 최우진","15분 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0/resourceGroups/readier-rg/providers/Microsoft.Sql/servers/readier-sql-0627105449/databases/readierdb"
+"readier-win-plan","App Service 요금제","Korea Central","readier-rg","유가중 최우진","22분 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0/resourceGroups/readier-rg/providers/Microsoft.Web/serverfarms/readier-win-plan"
+"유가중 최우진","구독","","","유가중 최우진","13일 전","https://portal.azure.com#resource/subscriptions/465406c4-1619-4e59-be59-4d3dbe0087d0"

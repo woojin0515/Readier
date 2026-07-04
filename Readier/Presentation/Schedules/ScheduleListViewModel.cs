@@ -10,11 +10,9 @@ namespace Readier.ViewModels;
 
 public partial class ScheduleListViewModel : BaseViewModel
 {
-    internal const string StorageKey = "readier.schedules.v1";
-
     private static readonly CultureInfo KoreanCulture = new("ko-KR");
 
-    private readonly IStorageService _storage;
+    private readonly IPlanRepository _plans;
     private readonly IScheduleNotificationService _notifications;
     private readonly ILeaveTimeCalculator _calculator;
     private readonly NavigationManager _navigation;
@@ -56,12 +54,12 @@ public partial class ScheduleListViewModel : BaseViewModel
     public string CalendarMonthTitle => CalendarMonth.ToString("yyyy년 M월", KoreanCulture);
 
     public ScheduleListViewModel(
-        IStorageService storage,
+        IPlanRepository plans,
         IScheduleNotificationService notifications,
         ILeaveTimeCalculator calculator,
         NavigationManager navigation)
     {
-        _storage = storage;
+        _plans = plans;
         _notifications = notifications;
         _calculator = calculator;
         _navigation = navigation;
@@ -127,10 +125,7 @@ public partial class ScheduleListViewModel : BaseViewModel
         if (item is null) return;
 
         await _notifications.CancelAsync(item.Id);
-
-        var list = await _storage.GetAsync<List<Schedule>>(StorageKey) ?? new List<Schedule>();
-        list.RemoveAll(s => s.Id == item.Id);
-        await _storage.SetAsync(StorageKey, list);
+        await _plans.DeleteAsync(item.Id);
 
         await RebuildAsync();
     }
@@ -176,7 +171,7 @@ public partial class ScheduleListViewModel : BaseViewModel
 
     private async Task RebuildAsync()
     {
-        var list = await _storage.GetAsync<List<Schedule>>(StorageKey) ?? new List<Schedule>();
+        var list = (await _plans.ListAsync()).ToList();
         _allItems = list
             .OrderBy(s => s.StartTime)
             .Select(s => new ScheduleListItemViewModel(s, _calculator.Calculate(s)))

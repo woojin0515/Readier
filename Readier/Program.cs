@@ -9,8 +9,7 @@ using Readier.Services;
 using Readier.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
-var dbConnectionString = builder.Configuration.GetConnectionString("ReadierDb")
-                         ?? Environment.GetEnvironmentVariable("READIER_DB_CONNECTION");
+var dbConnectionString = ResolveDbConnectionString(builder.Configuration);
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"]
                      ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
@@ -49,12 +48,20 @@ builder.Services.AddScoped<PreferencesStorageService>();
 if (!string.IsNullOrWhiteSpace(dbConnectionString))
 {
     builder.Services.AddDbContextFactory<ReadierDbContext>(options =>
-        options.UseSqlServer(dbConnectionString));
+        options.UseSqlServer(
+            dbConnectionString,
+            sql =>
+            {
+                sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                sql.CommandTimeout(30);
+            }));
     builder.Services.AddScoped<IStorageService, UserScopedStorageService>();
+    builder.Services.AddScoped<IPlanRepository, UserScopedPlanRepository>();
 }
 else
 {
     builder.Services.AddScoped<IStorageService, PreferencesStorageService>();
+    builder.Services.AddScoped<IPlanRepository, StoragePlanRepository>();
 }
 
 builder.Services.AddScoped<IUserPreferencesService, UserPreferencesService>();
@@ -127,3 +134,19 @@ app.MapRazorComponents<global::Readier.App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+static string? ResolveDbConnectionString(IConfiguration configuration)
+{
+    var candidates = new[]
+    {
+        configuration.GetConnectionString("ReadierDb"),
+        configuration.GetConnectionString("readierdb"),
+        Environment.GetEnvironmentVariable("READIER_DB_CONNECTION"),
+        Environment.GetEnvironmentVariable("ConnectionStrings__ReadierDb"),
+        Environment.GetEnvironmentVariable("ConnectionStrings__readierdb"),
+        Environment.GetEnvironmentVariable("SQLAZURECONNSTR_readierdb"),
+        Environment.GetEnvironmentVariable("SQLCONNSTR_readierdb")
+    };
+
+    return candidates.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+}

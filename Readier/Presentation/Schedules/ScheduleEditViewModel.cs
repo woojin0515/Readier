@@ -9,7 +9,7 @@ namespace Readier.ViewModels;
 
 public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
 {
-    private readonly IStorageService _storage;
+    private readonly IPlanRepository _plans;
     private readonly ILeaveTimeCalculator _calculator;
     private readonly IScheduleNotificationService _notifications;
     private readonly ITravelTimeProvider _travelProvider;
@@ -95,7 +95,7 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
     public IReadOnlyList<TransportationOption> TransportationOptions { get; } = TransportationCatalog.All;
 
     public ScheduleEditViewModel(
-        IStorageService storage,
+        IPlanRepository plans,
         ILeaveTimeCalculator calculator,
         IScheduleNotificationService notifications,
         ITravelTimeProvider travelProvider,
@@ -103,7 +103,7 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
         IUserPreferencesService preferences,
         NavigationManager navigation)
     {
-        _storage = storage;
+        _plans = plans;
         _calculator = calculator;
         _notifications = notifications;
         _travelProvider = travelProvider;
@@ -153,9 +153,7 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
             return;
         }
 
-        var list = await _storage.GetAsync<List<Schedule>>(ScheduleListViewModel.StorageKey)
-                   ?? new List<Schedule>();
-        var existing = list.FirstOrDefault(s => s.Id == guid);
+        var existing = await _plans.FindAsync(guid);
         if (existing is null)
         {
             _isInitializing = false;
@@ -256,37 +254,10 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
             return;
         }
 
-        var list = await _storage.GetAsync<List<Schedule>>(ScheduleListViewModel.StorageKey)
-                   ?? new List<Schedule>();
         var combined = StartDate.Date + StartTime.ToTimeSpan();
         var transportation = TransportationOption?.Mode ?? TransportationMode.PublicTransit;
-        Schedule saved;
-
-        if (IsEditMode && Guid.TryParse(Id, out var guid))
-        {
-            var idx = list.FindIndex(s => s.Id == guid);
-            if (idx >= 0)
-            {
-                list[idx].Title = ScheduleTitle.Trim();
-                list[idx].Origin = OriginPlace;
-                list[idx].Destination = DestinationPlace;
-                list[idx].StartTime = combined;
-                list[idx].EstimatedTravelMinutes = TravelMinutes;
-                list[idx].EstimatedPrepMinutes = PrepMinutes;
-                list[idx].Transportation = transportation;
-                saved = list[idx];
-            }
-            else
-            {
-                saved = AppendNew(list, combined, transportation);
-            }
-        }
-        else
-        {
-            saved = AppendNew(list, combined, transportation);
-        }
-
-        await _storage.SetAsync(ScheduleListViewModel.StorageKey, list);
+        var saved = BuildSchedule(combined, transportation);
+        await _plans.SaveAsync(saved);
         await SaveRecentPreferencesAsync(transportation);
         await _notifications.ScheduleAsync(saved);
         _navigation.NavigateTo("/");
@@ -299,10 +270,11 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
         return Task.CompletedTask;
     }
 
-    private Schedule AppendNew(List<Schedule> list, DateTime startDateTime, TransportationMode transportation)
+    private Schedule BuildSchedule(DateTime startDateTime, TransportationMode transportation)
     {
         var schedule = new Schedule
         {
+            Id = IsEditMode && Guid.TryParse(Id, out var guid) ? guid : Guid.NewGuid(),
             Title = ScheduleTitle.Trim(),
             Origin = OriginPlace,
             Destination = DestinationPlace,
@@ -311,7 +283,6 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
             EstimatedPrepMinutes = PrepMinutes,
             Transportation = transportation
         };
-        list.Add(schedule);
         return schedule;
     }
 

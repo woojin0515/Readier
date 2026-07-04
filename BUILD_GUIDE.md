@@ -201,6 +201,7 @@ GOOGLE_CLIENT_SECRET="<google-oauth-client-secret>"
 ```
 
 - `READIER_DB_CONNECTION` is used for Azure SQL persistence.
+- Azure App Service에서 Connection String 이름을 `readierdb`로 등록한 경우에도 자동 인식됩니다 (`SQLAZURECONNSTR_readierdb` / `SQLCONNSTR_readierdb`).
 - If DB connection is missing, the app falls back to browser localStorage only.
 - If Google OAuth keys are missing, `/auth/login` redirects back to `/` without login.
 
