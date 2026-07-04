@@ -20,7 +20,7 @@ public class KakaoPlaceSearchService : IPlaceSearchService
     public async Task<IReadOnlyList<PlaceSearchResult>> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query)) return Array.Empty<PlaceSearchResult>();
-        if (!ApiKeys.HasKakaoKey) return Array.Empty<PlaceSearchResult>();
+        if (!KakaoApiKeyResolver.HasKey) return Array.Empty<PlaceSearchResult>();
 
         var url = $"{KeywordEndpoint}?query={Uri.EscapeDataString(query)}&size=10";
         using var request = BuildRequest(url);
@@ -57,7 +57,7 @@ public class KakaoPlaceSearchService : IPlaceSearchService
     public async Task<Place?> GeocodeAsync(string address, string? displayName = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(address)) return null;
-        if (!ApiKeys.HasKakaoKey) return null;
+        if (!KakaoApiKeyResolver.HasKey) return null;
 
         var url = $"{AddressEndpoint}?query={Uri.EscapeDataString(address)}&size=1";
         using var request = BuildRequest(url);
@@ -93,7 +93,7 @@ public class KakaoPlaceSearchService : IPlaceSearchService
     private static HttpRequestMessage BuildRequest(string url)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoRestApiKey}");
+        request.Headers.Add("Authorization", $"KakaoAK {KakaoApiKeyResolver.GetKey()}");
         return request;
     }
 

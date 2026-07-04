@@ -5,7 +5,16 @@
 
 <div class="page-stack">
     <section class="card">
-        <h1>알림 설정</h1>
+        <h1>프로필</h1>
+        <label>
+            <span>표시 이름</span>
+            <input class="form-input" placeholder="예: 우진" @bind="ViewModel.DisplayName" />
+        </label>
+        <p class="muted">홈 화면 인사와 일정 제목에 사용됩니다.</p>
+    </section>
+
+    <section class="card">
+        <h2>알림 설정</h2>
         <label class="switch-row">
             <span>알림 사용</span>
             <input type="checkbox" @bind="ViewModel.NotificationsEnabled" />
@@ -24,7 +33,7 @@
                 }
             </select>
         </label>
-        <p class="muted" style="font-size: var(--text-xs);">0분은 사용 안 함입니다. 5분 이상 설정하면 출발 전에 한 번 더 알려드려요.</p>
+        <p class="muted-note">0분은 사용 안 함입니다. 5분 이상 설정하면 출발 전에 한 번 더 알려드려요.</p>
 
         <div class="divider"></div>
 
@@ -40,12 +49,26 @@
 
         <label class="switch-row">
             <span>부담 없는 알림 문구</span>
-            <input type="checkbox" class="switch-input" @bind="ViewModel.UseCalmReminderCopy" />
+            <input type="checkbox"
+                   class="switch-input"
+                   @bind="ViewModel.UseCalmReminderCopy"
+                   @bind:after="OnCalmReminderChangedAsync" />
         </label>
+        <button type="button" class="button-secondary full mt-12" @onclick="PreviewReminderAsync">이렇게 표시됩니다</button>
+        <p class="muted-note">누르면 브라우저 알림으로 실제 미리보기가 뜹니다.</p>
+
+        @if (ViewModel.HasPreviewError)
+        {
+            <div class="status error">@ViewModel.PreviewMessage</div>
+        }
+        @if (ViewModel.HasPreviewInfo)
+        {
+            <div class="status info">@ViewModel.PreviewMessage</div>
+        }
     </section>
 
     <section class="card">
-        <h2>iOS 확장 <span style="font-size: var(--text-xs); color: var(--text-secondary);">(향후 예정)</span></h2>
+        <h2>iOS 확장 <span class="section-pending">(향후 예정)</span></h2>
         <p class="muted">Live Activities / Dynamic Island 지원은 2차 구현 예정입니다.</p>
     </section>
 </div>
@@ -54,5 +77,17 @@
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.LoadAsync();
+    }
+
+    private async Task OnCalmReminderChangedAsync()
+    {
+        await ViewModel.PreviewReminderAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task PreviewReminderAsync()
+    {
+        await ViewModel.PreviewReminderAsync();
+        await InvokeAsync(StateHasChanged);
     }
 }

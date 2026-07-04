@@ -402,3 +402,8 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# ---- Local publish artifacts ----
+app.zip
+publish.zip
+publish-temp/

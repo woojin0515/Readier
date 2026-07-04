@@ -9,6 +9,18 @@
         </div>
 
         <NavMenu OnNavigate="CloseDrawer" />
+
+        <div class="sidebar-account">
+            <AuthorizeView>
+                <Authorized>
+                    <a class="button-tonal full" href="/auth/switch">계정 전환</a>
+                    <a class="button-secondary full" href="/auth/logout">로그아웃</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="button-tonal full" href="/auth/login">Google 로그인</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
     </aside>
 
     <div class="backdrop @(IsDrawerOpen ? "show" : string.Empty)" @onclick="CloseDrawer"></div>
@@ -20,6 +32,14 @@
                 <button type="button" class="topbar-title topbar-link" @onclick="GoHome">Readier</button>
             </div>
             <div class="topbar-spacer"></div>
+            <AuthorizeView>
+                <Authorized>
+                    <a class="button-tonal" href="/auth/logout">로그아웃</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="button-tonal" href="/auth/login">Google 로그인</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </header>
 
         <main class="content">

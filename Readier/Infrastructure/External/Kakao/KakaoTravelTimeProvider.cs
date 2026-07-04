@@ -24,7 +24,7 @@ public class KakaoTravelTimeProvider : ITravelTimeProvider
     {
         if (origin is null || destination is null) return null;
         if (!origin.HasCoordinates || !destination.HasCoordinates) return null;
-        if (!ApiKeys.HasKakaoKey) return null;
+        if (!KakaoApiKeyResolver.HasKey) return null;
 
         var (drivingMinutes, distanceKm) = await CallDirectionAsync(origin, destination, cancellationToken);
         if (drivingMinutes is null) return null;
@@ -56,7 +56,7 @@ public class KakaoTravelTimeProvider : ITravelTimeProvider
         var url = $"{DirectionEndpoint}?origin={originParam}&destination={destParam}&priority=RECOMMEND";
 
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Authorization", $"KakaoAK {ApiKeys.KakaoRestApiKey}");
+        request.Headers.Add("Authorization", $"KakaoAK {KakaoApiKeyResolver.GetKey()}");
 
         try
         {

@@ -20,7 +20,7 @@
         {
             <div class="divider"></div>
             <div class="recent-places">
-                <div class="muted" style="font-size: var(--text-xs); font-weight: var(--font-bold);">최근 장소</div>
+                <div class="recent-places-title">최근 장소</div>
                 <div class="recent-place-grid">
                     @foreach (var place in ViewModel.RecentPlaces)
                     {
@@ -79,7 +79,7 @@
                 <input class="form-input" type="number" min="0" step="1" @bind="ViewModel.PrepMinutes" placeholder="0" />
             </label>
         </div>
-        <button type="button" class="button-tonal full" @onclick="CalculateTravelAsync" disabled="@ViewModel.IsCalculating" style="margin-top: var(--sp-12);">
+        <button type="button" class="button-tonal full mt-12" @onclick="CalculateTravelAsync" disabled="@ViewModel.IsCalculating">
             @if (ViewModel.IsCalculating)
             {
                 <span>계산 중...</span>
@@ -89,7 +89,7 @@
                 <span>이동 시간 자동 계산</span>
             }
         </button>
-        <p class="muted" style="font-size: var(--text-xs); margin-top: var(--sp-12); margin-bottom: 0;">자동 계산이 실패해도 직접 입력할 수 있습니다.</p>
+        <p class="muted-note">자동 계산이 실패해도 직접 입력할 수 있습니다.</p>
     </section>
 
     <section class="card accent-card">

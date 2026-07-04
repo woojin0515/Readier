@@ -2,6 +2,8 @@ namespace Readier.Models;
 
 public class UserPreferences
 {
+    public string DisplayName { get; set; } = string.Empty;
+
     public bool NotificationsEnabled { get; set; } = true;
 
     public NotificationPreferences Notification { get; set; } = new();

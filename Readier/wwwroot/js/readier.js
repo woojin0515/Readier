@@ -27,6 +27,18 @@ window.readierNotifications = {
         const permission = await Notification.requestPermission();
         return permission === "granted";
     },
+    showNow: function (title, description) {
+        if (!("Notification" in window)) {
+            return false;
+        }
+
+        if (Notification.permission !== "granted") {
+            return false;
+        }
+
+        new Notification(title, { body: description });
+        return true;
+    },
     schedule: function (id, title, description, notifyTime) {
         if (!("Notification" in window)) {
             return;

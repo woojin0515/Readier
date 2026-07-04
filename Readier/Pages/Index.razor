@@ -1,10 +1,26 @@
 @page "/"
 @page "/schedules"
 @inject ScheduleListViewModel ViewModel
+@inject IUserPreferencesService Preferences
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 
 <PageTitle>일정</PageTitle>
 
 <div class="page-stack">
+    <section class="card home-welcome-card">
+        <div class="home-welcome-eyebrow">오늘도 여유 있게</div>
+        <h1 class="home-welcome-title">@GreetingMessage</h1>
+        <p class="muted home-welcome-copy">@(PersonalizedAgendaTitle)에서 준비 시작/출발 시간을 바로 확인해요.</p>
+        @if (_needsSurveyOnboarding)
+        {
+            <div class="home-onboarding-row">
+                <div class="home-onboarding-copy">회원가입 루틴 분석을 아직 완료하지 않았어요. 1분 설문으로 기본 준비 시간을 더 정확하게 맞출 수 있어요.</div>
+                <a class="button-primary" href="/insights">분석 조사 시작</a>
+            </div>
+        }
+    </section>
+
     <section class="card controls-card">
         <div class="segmented">
             <button type="button" class="segment @(ViewModel.IsAgendaMode ? "active" : string.Empty)" @onclick="ShowAgendaAsync">오늘 아젠다</button>
@@ -35,7 +51,7 @@
     {
         <section class="section-header">
             <div>
-                <h1>@ViewModel.AgendaTitle</h1>
+                <h1>@PersonalizedAgendaTitle</h1>
                 <p class="muted">준비 시작/출발 시각을 확인하고 일정을 준비하세요.</p>
             </div>
             <div class="agenda-quick-nav" role="group" aria-label="아젠다 날짜 선택">
@@ -139,9 +155,64 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private string? _displayName;
+    private bool _needsSurveyOnboarding;
+
+    private string GreetingMessage => string.IsNullOrWhiteSpace(_displayName)
+        ? "안녕하세요"
+        : $"안녕하세요, {_displayName}님";
+
+    private string PersonalizedAgendaTitle => string.IsNullOrWhiteSpace(_displayName)
+        ? ViewModel.AgendaTitle
+        : $"{_displayName}님의 일정";
+
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.LoadCommand.ExecuteAsync(null);
+        await LoadUserContextAsync();
+    }
+
+    private async Task LoadUserContextAsync()
+    {
+        var authState = AuthenticationStateTask is null
+            ? null
+            : await AuthenticationStateTask;
+
+        var user = authState?.User;
+        var claimName = ResolveClaimName(user);
+
+        var prefs = await Preferences.GetAsync();
+        _displayName = string.IsNullOrWhiteSpace(prefs.DisplayName)
+            ? claimName
+            : prefs.DisplayName;
+
+        _needsSurveyOnboarding = user?.Identity?.IsAuthenticated == true
+                                 && prefs.PreparationProfile.Answers.Count == 0;
+    }
+
+    private static string? ResolveClaimName(ClaimsPrincipal? user)
+    {
+        if (user is null || user.Identity?.IsAuthenticated != true)
+            return null;
+
+        var candidates = new[]
+        {
+            user.FindFirst(ClaimTypes.GivenName)?.Value,
+            user.FindFirst(ClaimTypes.Name)?.Value,
+            user.Identity?.Name,
+            user.FindFirst(ClaimTypes.Email)?.Value
+        };
+
+        foreach (var candidate in candidates)
+        {
+            if (!string.IsNullOrWhiteSpace(candidate))
+                return candidate.Split('@')[0];
+        }
+
+        return null;
     }
 
     private async Task ShowAgendaAsync()

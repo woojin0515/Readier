@@ -190,6 +190,20 @@ This key is injected into `obj\Generated\ApiKeys.g.cs` (gitignored). If the env 
 - The app will build successfully
 - At runtime, place search and travel time features will show: "키가 설정되지 않았습니다" (key not configured)
 
+## Environment Variables at Runtime (Auth + DB)
+
+For cross-device sync and Google social login, set these runtime variables:
+
+```
+READIER_DB_CONNECTION="Server=tcp:<server>.database.windows.net,1433;Initial Catalog=<db>;Persist Security Info=False;User ID=<user>;Password=<password>;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+GOOGLE_CLIENT_ID="<google-oauth-client-id>"
+GOOGLE_CLIENT_SECRET="<google-oauth-client-secret>"
+```
+
+- `READIER_DB_CONNECTION` is used for Azure SQL persistence.
+- If DB connection is missing, the app falls back to browser localStorage only.
+- If Google OAuth keys are missing, `/auth/login` redirects back to `/` without login.
+
 ## Next Steps
 
 1. ✅ **CLI builds**: `dotnet build Readier.sln` (Windows, iOS, macOS)
