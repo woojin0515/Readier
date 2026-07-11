@@ -71,23 +71,9 @@ public class LocalNotificationService : IScheduleNotificationService
             LeaveSoonId(scheduleId)).AsTask();
     }
 
-    public async Task<bool> ShowPreviewAsync(bool useCalmCopy)
-    {
-        if (!await EnsurePermissionAsync())
-            return false;
-
-        var title = useCalmCopy ? "이제 천천히 준비를 시작해 볼까요?" : "준비 시작 시간이에요";
-        const string description = "이렇게 표시됩니다.";
-        await _js.InvokeVoidAsync("readierNotifications.showNow", title, description);
-        return true;
-    }
-
     private async Task<bool> EnsurePermissionAsync()
     {
-        if (await _js.InvokeAsync<bool>("readierNotifications.isEnabled"))
-            return true;
-
-        return await _js.InvokeAsync<bool>("readierNotifications.requestPermission");
+        return await _js.InvokeAsync<bool>("readierNotifications.isEnabled");
     }
 
     private Task ScheduleBrowserNotificationAsync(int id, string title, string description, DateTime notifyTime)

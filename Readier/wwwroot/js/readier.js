@@ -12,6 +12,29 @@ window.readierStorage = {
 
 window.readierNotifications = {
     timers: {},
+    setStatus: function (elementId, message, isError) {
+        if (!elementId) {
+            return;
+        }
+
+        const element = document.getElementById(elementId);
+        if (!element) {
+            return;
+        }
+
+        if (!message) {
+            element.hidden = true;
+            element.textContent = "";
+            element.classList.remove("error");
+            element.classList.add("info");
+            return;
+        }
+
+        element.hidden = false;
+        element.textContent = message;
+        element.classList.toggle("error", !!isError);
+        element.classList.toggle("info", !isError);
+    },
     isEnabled: function () {
         return "Notification" in window && Notification.permission === "granted";
     },
@@ -27,6 +50,31 @@ window.readierNotifications = {
         const permission = await Notification.requestPermission();
         return permission === "granted";
     },
+    requestPermissionFromGesture: async function (statusElementId) {
+        if (!("Notification" in window)) {
+            window.readierNotifications.setStatus(statusElementId, "이 브라우저는 알림을 지원하지 않습니다.", true);
+            return false;
+        }
+
+        if (Notification.permission === "granted") {
+            window.readierNotifications.setStatus(statusElementId, "이미 알림 권한이 허용되어 있습니다.", false);
+            return true;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            window.readierNotifications.setStatus(statusElementId, "알림 권한이 허용되었습니다.", false);
+            return true;
+        }
+
+        if (permission === "denied") {
+            window.readierNotifications.setStatus(statusElementId, "브라우저에서 알림이 차단되어 있습니다. 사이트 설정에서 허용해 주세요.", true);
+            return false;
+        }
+
+        window.readierNotifications.setStatus(statusElementId, "알림 권한 요청이 취소되었습니다.", true);
+        return false;
+    },
     showNow: function (title, description) {
         if (!("Notification" in window)) {
             return false;
@@ -37,6 +85,18 @@ window.readierNotifications = {
         }
 
         new Notification(title, { body: description });
+        return true;
+    },
+    previewFromGesture: async function (useCalmCopy, statusElementId) {
+        const granted = await window.readierNotifications.requestPermissionFromGesture(statusElementId);
+        if (!granted) {
+            return false;
+        }
+
+        const title = useCalmCopy ? "이제 천천히 준비를 시작해 볼까요?" : "준비 시작 시간이에요";
+        const description = "이렇게 표시됩니다.";
+        new Notification(title, { body: description });
+        window.readierNotifications.setStatus(statusElementId, "알림 미리보기를 표시했습니다.", false);
         return true;
     },
     schedule: function (id, title, description, notifyTime) {

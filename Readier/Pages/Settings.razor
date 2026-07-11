@@ -17,9 +17,14 @@
         <h2>알림 설정</h2>
         <label class="switch-row">
             <span>알림 사용</span>
-            <input type="checkbox" @bind="ViewModel.NotificationsEnabled" />
+            <input type="checkbox" class="switch-input" @bind="ViewModel.NotificationsEnabled" />
         </label>
         <p class="muted">끄면 일정 저장 시 준비/출발 알림이 예약되지 않습니다.</p>
+        <button type="button"
+                class="button-secondary full mt-12"
+                onclick="window.readierNotifications.requestPermissionFromGesture('notification-preview-status');">
+            브라우저 알림 권한 요청
+        </button>
     </section>
 
     <section class="card">
@@ -50,21 +55,17 @@
         <label class="switch-row">
             <span>부담 없는 알림 문구</span>
             <input type="checkbox"
+                   id="calmReminderSwitch"
                    class="switch-input"
-                   @bind="ViewModel.UseCalmReminderCopy"
-                   @bind:after="OnCalmReminderChangedAsync" />
+                   @bind="ViewModel.UseCalmReminderCopy" />
         </label>
-        <button type="button" class="button-secondary full mt-12" @onclick="PreviewReminderAsync">이렇게 표시됩니다</button>
+        <button type="button"
+                class="button-secondary full mt-12"
+                onclick="window.readierNotifications.previewFromGesture(document.getElementById('calmReminderSwitch')?.checked ?? true, 'notification-preview-status');">
+            이렇게 표시됩니다
+        </button>
         <p class="muted-note">누르면 브라우저 알림으로 실제 미리보기가 뜹니다.</p>
-
-        @if (ViewModel.HasPreviewError)
-        {
-            <div class="status error">@ViewModel.PreviewMessage</div>
-        }
-        @if (ViewModel.HasPreviewInfo)
-        {
-            <div class="status info">@ViewModel.PreviewMessage</div>
-        }
+        <div id="notification-preview-status" class="status info" hidden></div>
     </section>
 
     <section class="card">
@@ -77,17 +78,5 @@
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.LoadAsync();
-    }
-
-    private async Task OnCalmReminderChangedAsync()
-    {
-        await ViewModel.PreviewReminderAsync();
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task PreviewReminderAsync()
-    {
-        await ViewModel.PreviewReminderAsync();
-        await InvokeAsync(StateHasChanged);
     }
 }

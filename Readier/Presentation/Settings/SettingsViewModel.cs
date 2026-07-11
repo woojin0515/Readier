@@ -8,7 +8,6 @@ namespace Readier.ViewModels;
 public partial class SettingsViewModel : BaseViewModel
 {
     private readonly IUserPreferencesService _preferences;
-    private readonly IScheduleNotificationService _notifications;
     private bool _isLoading = true;
 
     public IReadOnlyList<int> ReminderMinuteOptions { get; } = NotificationInteractionSpec.LeaveSoonOptions;
@@ -29,24 +28,9 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private bool useCalmReminderCopy = true;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasPreviewError))]
-    [NotifyPropertyChangedFor(nameof(HasPreviewInfo))]
-    private string? previewMessage;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasPreviewError))]
-    [NotifyPropertyChangedFor(nameof(HasPreviewInfo))]
-    private bool isPreviewError;
-
-    public bool HasPreviewError => !string.IsNullOrWhiteSpace(PreviewMessage) && IsPreviewError;
-
-    public bool HasPreviewInfo => !string.IsNullOrWhiteSpace(PreviewMessage) && !IsPreviewError;
-
-    public SettingsViewModel(IUserPreferencesService preferences, IScheduleNotificationService notifications)
+    public SettingsViewModel(IUserPreferencesService preferences)
     {
         _preferences = preferences;
-        _notifications = notifications;
         Title = "설정";
         PropertyChanged += OnAnyPropertyChanged;
     }
@@ -85,18 +69,5 @@ public partial class SettingsViewModel : BaseViewModel
         prefs.Notification.SnoozePresetMinutes = SnoozePresetMinutes;
         prefs.Notification.UseCalmReminderCopy = UseCalmReminderCopy;
         await _preferences.SaveAsync(prefs);
-    }
-
-    public async Task PreviewReminderAsync()
-    {
-        if (await _notifications.ShowPreviewAsync(UseCalmReminderCopy))
-        {
-            PreviewMessage = "이렇게 표시됩니다.";
-            IsPreviewError = false;
-            return;
-        }
-
-        PreviewMessage = "브라우저 알림 권한을 허용하면 미리보기를 볼 수 있어요.";
-        IsPreviewError = true;
     }
 }
