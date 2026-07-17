@@ -38,7 +38,14 @@
 
     @if (ViewModel.Questions.Count > 0)
     {
-        <button type="button" class="button-primary full" @onclick="SaveAsync">저장하기</button>
+        <button type="button" class="button-primary full" @onclick="SaveAsync" disabled="@_isSaving">
+            @(_isSaving ? "저장 중..." : "저장하기")
+        </button>
+
+        @if (!string.IsNullOrEmpty(_saveMessage))
+        {
+            <p class="save-status @(_saveError ? "error" : "")">@_saveMessage</p>
+        }
     }
 </div>
 
@@ -95,9 +102,57 @@
         return null;
     }
 
+    private bool _isSaving;
+    private string? _saveMessage;
+    private bool _saveError;
+    private CancellationTokenSource? _saveMessageTimeout;
+
     private async Task SaveAsync()
     {
-        await ViewModel.SaveAsync();
+        if (_isSaving) return;
+
+        _isSaving = true;
+        _saveMessage = null;
         await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await ViewModel.SaveAsync();
+            _saveError = false;
+            _saveMessage = "저장되었습니다.";
+        }
+        catch
+        {
+            _saveError = true;
+            _saveMessage = "저장에 실패했습니다. 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _isSaving = false;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        ScheduleMessageClear();
+    }
+
+    private void ScheduleMessageClear()
+    {
+        _saveMessageTimeout?.Cancel();
+        _saveMessageTimeout = new CancellationTokenSource();
+        var token = _saveMessageTimeout.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(3), token);
+                if (token.IsCancellationRequested) return;
+                _saveMessage = null;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        });
     }
 }

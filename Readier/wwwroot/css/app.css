@@ -648,6 +648,18 @@ button {
     font-weight: var(--font-bold);
 }
 
+.save-status {
+    margin-top: var(--sp-8);
+    text-align: center;
+    color: var(--accent);
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
+}
+
+.save-status.error {
+    color: var(--danger);
+}
+
 .schedule-card.late {
     border-color: rgba(239, 68, 68, 0.35);
 }
