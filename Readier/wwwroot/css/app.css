@@ -62,6 +62,10 @@
     --bp-tablet: 1024px;
     --bp-mobile-nav: 920px;
     --bp-mobile: 640px;
+
+    --fab-size: 60px;
+    --fab-right: 16px;
+    --fab-bottom: 16px;
 }
 
 /* =========================
@@ -559,10 +563,10 @@ button {
 
 .fab {
     position: fixed;
-    right: var(--sp-16);
-    bottom: var(--sp-16);
-    width: 60px;
-    height: 60px;
+    right: var(--fab-right);
+    bottom: calc(var(--fab-bottom) + env(safe-area-inset-bottom));
+    width: var(--fab-size);
+    height: var(--fab-size);
     background: var(--accent);
     color: white;
     font-size: 32px;
@@ -570,6 +574,7 @@ button {
     box-shadow: 0 12px 32px rgba(0, 122, 255, 0.35);
     cursor: pointer;
     transition: all 0.2s ease;
+    z-index: 8;
 }
 
 .fab:hover {
@@ -1257,6 +1262,12 @@ button {
 }
 
 @media (max-width: 920px) {
+    :root {
+        --fab-size: 56px;
+        --fab-right: 14px;
+        --fab-bottom: 76px;
+    }
+
     .sidebar {
         width: min(84vw, 320px);
         flex-basis: min(84vw, 320px);
@@ -1306,6 +1317,12 @@ button {
 }
 
 @media (max-width: 640px) {
+    :root {
+        --fab-size: 54px;
+        --fab-right: 12px;
+        --fab-bottom: 86px;
+    }
+
     .page-stack {
         gap: var(--sp-16);
         max-width: none;
