@@ -17,7 +17,6 @@ public static class PreparationSurvey
     public const string MakeupKey = "makeup";
     public const string HairStylingKey = "hairStyling";
     public const string OutfitKey = "outfit";
-    public const string BreakfastKey = "breakfast";
     public const string MorningStartKey = "morningStart";
     public const string PaceKey = "pace";
 
@@ -32,7 +31,7 @@ public static class PreparationSurvey
         new SurveyQuestion(AgeRangeKey, "나이대", new[]
         {
             new SurveyOption("답하지 않음", 0),
-            new SurveyOption("10대 이하", 0),
+            new SurveyOption("10대", 0),
             new SurveyOption("20대", 0),
             new SurveyOption("30대", 0),
             new SurveyOption("40대", 0),
@@ -84,13 +83,6 @@ public static class PreparationSurvey
             new SurveyOption("아침에 빠르게 (5분)", 5),
             new SurveyOption("평소대로 시간 들여 (10분)", 10),
             new SurveyOption("자주 갈아입거나 한참 고민 (15분 이상)", 18)
-        }),
-        new SurveyQuestion(BreakfastKey, "아침 식사", new[]
-        {
-            new SurveyOption("안 먹음", 0),
-            new SurveyOption("음료/간식만 (5분)", 5),
-            new SurveyOption("간단한 식사 (15분)", 15),
-            new SurveyOption("정찬 (25분 이상)", 25)
         }),
         new SurveyQuestion(MorningStartKey, "일어나서 첫 행동까지", new[]
         {
