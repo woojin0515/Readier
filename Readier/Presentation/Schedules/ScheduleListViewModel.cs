@@ -59,6 +59,8 @@ public partial class ScheduleListViewModel : BaseViewModel
 
     public string CalendarMonthTitle => CalendarMonth.ToString("yyyy년 M월", KoreanCulture);
 
+    public string EmptyAgendaMessage => BuildEmptyAgendaMessage(SelectedDate, IsThisWeekMode, ShowLateOnly);
+
     public ScheduleListViewModel(
         IPlanRepository plans,
         IScheduleNotificationService notifications,
@@ -298,6 +300,20 @@ public partial class ScheduleListViewModel : BaseViewModel
             return $"출발까지 {countdown}";
 
         return "이미 지난 일정이에요";
+    }
+
+    private static string BuildEmptyAgendaMessage(DateTime date, bool isThisWeekMode, bool lateOnly)
+    {
+        if (lateOnly)
+            return "늦은 일정이 없어요";
+
+        var today = AppClock.Today;
+        if (!isThisWeekMode && date.Date == today)
+            return "오늘 일정이 없어요";
+        if (!isThisWeekMode && date.Date == today.AddDays(1))
+            return "내일 일정이 없어요";
+
+        return $"{date.ToString("M/d(ddd)", KoreanCulture)} 일정이 없어요";
     }
 
     private void RebuildThisWeekDates()
