@@ -10,6 +10,28 @@ window.readierStorage = {
     }
 };
 
+window.readierInputs = {
+    openPicker: function (elementId) {
+        if (!elementId) {
+            return;
+        }
+
+        const input = document.getElementById(elementId);
+        if (!input) {
+            return;
+        }
+
+        input.focus();
+        if (typeof input.showPicker === "function") {
+            try {
+                input.showPicker();
+            } catch {
+                // Some browsers require a stricter user gesture chain.
+            }
+        }
+    }
+};
+
 window.readierNotifications = {
     timers: {},
     setStatus: function (elementId, message, isError) {
