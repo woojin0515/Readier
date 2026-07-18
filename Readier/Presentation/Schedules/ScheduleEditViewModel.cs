@@ -40,12 +40,12 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LeaveAt))]
     [NotifyPropertyChangedFor(nameof(StartPrepAt))]
-    private DateTime startDate = DateTime.Today;
+    private DateTime startDate = AppClock.Today;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LeaveAt))]
     [NotifyPropertyChangedFor(nameof(StartPrepAt))]
-    private TimeOnly startTime = TimeOnly.FromDateTime(DateTime.Now);
+    private TimeOnly startTime = TimeOnly.FromDateTime(AppClock.Now);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LeaveAt))]
@@ -86,13 +86,13 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
 
     public DateTime StartPrepAt => CalculatePlan().StartPrepAt;
 
-    public DateTime DisplayLeaveAt => LeaveAt <= DateTime.Now ? DateTime.Now : LeaveAt;
+    public DateTime DisplayLeaveAt => LeaveAt <= AppClock.Now ? AppClock.Now : LeaveAt;
 
-    public DateTime DisplayStartPrepAt => StartPrepAt <= DateTime.Now ? DateTime.Now : StartPrepAt;
+    public DateTime DisplayStartPrepAt => StartPrepAt <= AppClock.Now ? AppClock.Now : StartPrepAt;
 
-    public bool IsLeaveLate => LeaveAt <= DateTime.Now;
+    public bool IsLeaveLate => LeaveAt <= AppClock.Now;
 
-    public bool IsStartPrepLate => StartPrepAt <= DateTime.Now;
+    public bool IsStartPrepLate => StartPrepAt <= AppClock.Now;
 
     public bool ShouldShowRecentPlaces => RecentPlaces.Count > 0 && (OriginPlace is null || DestinationPlace is null);
 
@@ -145,8 +145,8 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
             ScheduleTitle = string.Empty;
             OriginPlace = RecentPlaces.FirstOrDefault();
             DestinationPlace = null;
-            StartDate = DateTime.Today;
-            StartTime = TimeOnly.FromDateTime(DateTime.Now);
+            StartDate = AppClock.Today;
+            StartTime = TimeOnly.FromDateTime(AppClock.Now);
             TravelMinutes = 30;
             PrepMinutes = GetDefaultPrepMinutes(prefs);
             _isAutoFilledPrep = true;

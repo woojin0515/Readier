@@ -1,9 +1,11 @@
 @page "/"
 @page "/schedules"
+@implements IDisposable
 @inject ScheduleListViewModel ViewModel
 @inject IUserPreferencesService Preferences
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Readier.Helpers
 
 <PageTitle>일정</PageTitle>
 
@@ -55,11 +57,26 @@
                 <p class="muted">준비 시작/출발 시각을 확인하고 일정을 준비하세요.</p>
             </div>
             <div class="agenda-quick-nav" role="group" aria-label="아젠다 날짜 선택">
-                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today ? "active" : string.Empty)" @onclick="GoToTodayAsync">오늘</button>
-                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today.AddDays(1) ? "active" : string.Empty)" @onclick="GoToTomorrowAsync">내일</button>
-                <button type="button" class="button-tonal @(ViewModel.SelectedDate.Date == DateTime.Today.AddDays(2) ? "active" : string.Empty)" @onclick="GoToDayAfterTomorrowAsync">모레</button>
+                <button type="button" class="button-tonal @(!ViewModel.IsThisWeekMode && ViewModel.SelectedDate.Date == AppClock.Today ? "active" : string.Empty)" @onclick="GoToTodayAsync">오늘</button>
+                <button type="button" class="button-tonal @(!ViewModel.IsThisWeekMode && ViewModel.SelectedDate.Date == AppClock.Today.AddDays(1) ? "active" : string.Empty)" @onclick="GoToTomorrowAsync">내일</button>
+                <button type="button" class="button-tonal @(ViewModel.IsThisWeekMode ? "active" : string.Empty)" @onclick="GoToThisWeekAsync">이번주</button>
             </div>
         </section>
+
+        @if (ViewModel.IsThisWeekMode)
+        {
+            <section class="week-chip-row" aria-label="이번주 날짜 선택">
+                @foreach (var date in ViewModel.ThisWeekDates)
+                {
+                    <button type="button"
+                            class="week-chip @(ViewModel.SelectedDate.Date == date.Date ? "active" : string.Empty)"
+                            @onclick="() => SelectThisWeekDateAsync(date)">
+                        <span>@date.ToString("ddd")</span>
+                        <strong>@date.ToString("M/d")</strong>
+                    </button>
+                }
+            </section>
+        }
 
         @if (ViewModel.VisibleItems.Count == 0)
         {
@@ -160,6 +177,7 @@
 
     private string? _displayName;
     private bool _needsSurveyOnboarding;
+    private CancellationTokenSource? _clockRefreshCts;
 
     private string GreetingMessage => string.IsNullOrWhiteSpace(_displayName)
         ? "안녕하세요"
@@ -173,6 +191,7 @@
     {
         await ViewModel.LoadCommand.ExecuteAsync(null);
         await LoadUserContextAsync();
+        StartClockRefresh();
     }
 
     private async Task LoadUserContextAsync()
@@ -235,15 +254,19 @@
 
     private async Task GoToTomorrowAsync()
     {
-        ViewModel.SelectDateCommand.Execute(DateTime.Today.AddDays(1));
-        ViewModel.ShowAgendaCommand.Execute(null);
+        ViewModel.GoToTomorrowCommand.Execute(null);
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task GoToDayAfterTomorrowAsync()
+    private async Task GoToThisWeekAsync()
     {
-        ViewModel.SelectDateCommand.Execute(DateTime.Today.AddDays(2));
-        ViewModel.ShowAgendaCommand.Execute(null);
+        ViewModel.GoToThisWeekCommand.Execute(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectThisWeekDateAsync(DateTime date)
+    {
+        ViewModel.SelectThisWeekDateCommand.Execute(date);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -286,5 +309,34 @@
     {
         await ViewModel.DeleteCommand.ExecuteAsync(item);
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void StartClockRefresh()
+    {
+        _clockRefreshCts?.Cancel();
+        _clockRefreshCts = new CancellationTokenSource();
+        var token = _clockRefreshCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+                while (await timer.WaitForNextTickAsync(token))
+                {
+                    ViewModel.RefreshNowSensitiveState();
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }, token);
+    }
+
+    public void Dispose()
+    {
+        _clockRefreshCts?.Cancel();
+        _clockRefreshCts?.Dispose();
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.JSInterop;
+using Readier.Helpers;
 using Readier.Interfaces;
 using Readier.Models;
 
@@ -29,7 +30,7 @@ public class LocalNotificationService : IScheduleNotificationService
             return;
 
         var plan = _calculator.Calculate(schedule);
-        var now = DateTime.Now;
+        var now = AppClock.Now;
         var destinationLabel = schedule.Destination?.DisplayLine ?? string.Empty;
         var description = string.IsNullOrWhiteSpace(destinationLabel)
             ? schedule.Title

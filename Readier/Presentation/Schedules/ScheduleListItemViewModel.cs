@@ -1,4 +1,5 @@
 using Readier.Models;
+using Readier.Helpers;
 
 namespace Readier.ViewModels;
 
@@ -25,11 +26,11 @@ public class ScheduleListItemViewModel
 
     public bool HasDestination => !string.IsNullOrWhiteSpace(DestinationLabel);
 
-    public bool IsStartPrepLate => StartPrepAt <= DateTime.Now;
+    public bool IsStartPrepLate => StartPrepAt <= AppClock.Now;
 
-    public bool IsLeaveLate => LeaveAt <= DateTime.Now;
+    public bool IsLeaveLate => LeaveAt <= AppClock.Now;
 
-    public DateTime DisplayStartPrepAt => IsStartPrepLate ? DateTime.Now : StartPrepAt;
+    public DateTime DisplayStartPrepAt => IsStartPrepLate ? AppClock.Now : StartPrepAt;
 
-    public DateTime DisplayLeaveAt => IsLeaveLate ? DateTime.Now : LeaveAt;
+    public DateTime DisplayLeaveAt => IsLeaveLate ? AppClock.Now : LeaveAt;
 }

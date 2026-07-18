@@ -3,6 +3,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.AspNetCore.Components;
+using Readier.Helpers;
 using Readier.Interfaces;
 using Readier.Models;
 
@@ -40,10 +41,15 @@ public partial class ScheduleListViewModel : BaseViewModel
     private string agendaTitle = "오늘 일정";
 
     [ObservableProperty]
-    private DateTime selectedDate = DateTime.Today;
+    private DateTime selectedDate = AppClock.Today;
 
     [ObservableProperty]
-    private DateTime calendarMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private DateTime calendarMonth = new(AppClock.Today.Year, AppClock.Today.Month, 1);
+
+    [ObservableProperty]
+    private bool isThisWeekMode;
+
+    public ObservableCollection<DateTime> ThisWeekDates { get; } = new();
 
     public bool IsCalendarMode => !IsAgendaMode;
 
@@ -164,9 +170,37 @@ public partial class ScheduleListViewModel : BaseViewModel
     [RelayCommand]
     private void GoToToday()
     {
-        SelectedDate = DateTime.Today;
+        SelectedDate = AppClock.Today;
         CalendarMonth = new DateTime(SelectedDate.Year, SelectedDate.Month, 1);
         IsAgendaMode = true;
+        IsThisWeekMode = false;
+    }
+
+    [RelayCommand]
+    private void GoToTomorrow()
+    {
+        SelectedDate = AppClock.Today.AddDays(1);
+        CalendarMonth = new DateTime(SelectedDate.Year, SelectedDate.Month, 1);
+        IsAgendaMode = true;
+        IsThisWeekMode = false;
+    }
+
+    [RelayCommand]
+    private void GoToThisWeek()
+    {
+        IsAgendaMode = true;
+        IsThisWeekMode = true;
+        RebuildThisWeekDates();
+        if (!IsDateInCurrentWeek(SelectedDate))
+            SelectedDate = AppClock.Today;
+    }
+
+    [RelayCommand]
+    private void SelectThisWeekDate(DateTime date)
+    {
+        IsAgendaMode = true;
+        IsThisWeekMode = true;
+        SelectedDate = date.Date;
     }
 
     private async Task RebuildAsync()
@@ -179,7 +213,8 @@ public partial class ScheduleListViewModel : BaseViewModel
 
         RebuildVisibleItems();
         RebuildCalendarDays();
-        NextUpcomingItem = _allItems.FirstOrDefault(i => i.StartTime >= DateTime.Now);
+        RebuildThisWeekDates();
+        NextUpcomingItem = _allItems.FirstOrDefault(i => i.StartTime >= AppClock.Now);
 
         foreach (var item in list)
         {
@@ -202,6 +237,13 @@ public partial class ScheduleListViewModel : BaseViewModel
         IsEmpty = VisibleItems.Count == 0;
     }
 
+    public void RefreshNowSensitiveState()
+    {
+        RebuildVisibleItems();
+        NextUpcomingItem = _allItems.FirstOrDefault(i => i.StartTime >= AppClock.Now);
+        OnPropertyChanged(nameof(NextUpcomingSummary));
+    }
+
     private void RebuildCalendarDays()
     {
         CalendarDays.Clear();
@@ -221,7 +263,7 @@ public partial class ScheduleListViewModel : BaseViewModel
 
     private static string FormatAgendaTitle(DateTime date, bool lateOnly)
     {
-        var today = DateTime.Today;
+        var today = AppClock.Today;
         var suffix = lateOnly ? " · 늦은 일정만" : string.Empty;
         if (date == today) return $"오늘 일정{suffix}";
         if (date == today.AddDays(1)) return $"내일 일정{suffix}";
@@ -234,7 +276,7 @@ public partial class ScheduleListViewModel : BaseViewModel
         if (item is null)
             return string.Empty;
 
-        var now = DateTime.Now;
+        var now = AppClock.Now;
         var target = item.StartPrepAt > now
             ? item.StartPrepAt
             : item.LeaveAt > now
@@ -256,5 +298,23 @@ public partial class ScheduleListViewModel : BaseViewModel
             return $"출발까지 {countdown}";
 
         return "이미 지난 일정이에요";
+    }
+
+    private void RebuildThisWeekDates()
+    {
+        ThisWeekDates.Clear();
+        var start = AppClock.Today.AddDays(-(int)(AppClock.Today.DayOfWeek == DayOfWeek.Sunday ? 6 : AppClock.Today.DayOfWeek - DayOfWeek.Monday));
+        for (var i = 0; i < 7; i++)
+        {
+            ThisWeekDates.Add(start.AddDays(i).Date);
+        }
+    }
+
+    private static bool IsDateInCurrentWeek(DateTime date)
+    {
+        var today = AppClock.Today;
+        var start = today.AddDays(-(int)(today.DayOfWeek == DayOfWeek.Sunday ? 6 : today.DayOfWeek - DayOfWeek.Monday));
+        var end = start.AddDays(6);
+        return date.Date >= start && date.Date <= end;
     }
 }
