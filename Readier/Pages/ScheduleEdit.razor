@@ -16,7 +16,7 @@
         <div class="spacer"></div>
         <PlacePicker Placeholder="목적지" SearchService="ViewModel.PlaceSearch" @bind-SelectedPlace="ViewModel.DestinationPlace" />
 
-        @if (ViewModel.RecentPlaces.Count > 0)
+        @if (ViewModel.ShouldShowRecentPlaces)
         {
             <div class="divider"></div>
             <div class="recent-places">
@@ -31,8 +31,12 @@
                                 <div class="recent-place-subtitle">@place.Address</div>
                             }
                             <div class="recent-place-actions">
-                                <button type="button" class="button-secondary small" @onclick="() => ViewModel.UseRecentOriginCommand.Execute(place)">출발지</button>
-                                <button type="button" class="button-secondary small" @onclick="() => ViewModel.UseRecentDestinationCommand.Execute(place)">목적지</button>
+                                <button type="button"
+                                        class="button-secondary small @(ViewModel.IsOriginSelected(place) ? "active" : string.Empty)"
+                                        @onclick="() => ViewModel.UseRecentOriginCommand.Execute(place)">출발지</button>
+                                <button type="button"
+                                        class="button-secondary small @(ViewModel.IsDestinationSelected(place) ? "active" : string.Empty)"
+                                        @onclick="() => ViewModel.UseRecentDestinationCommand.Execute(place)">목적지</button>
                             </div>
                         </article>
                     }

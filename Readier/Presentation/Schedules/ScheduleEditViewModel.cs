@@ -30,9 +30,11 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
     private string scheduleTitle = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShouldShowRecentPlaces))]
     private Place? originPlace;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShouldShowRecentPlaces))]
     private Place? destinationPlace;
 
     [ObservableProperty]
@@ -91,6 +93,8 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
     public bool IsLeaveLate => LeaveAt <= DateTime.Now;
 
     public bool IsStartPrepLate => StartPrepAt <= DateTime.Now;
+
+    public bool ShouldShowRecentPlaces => RecentPlaces.Count > 0 && (OriginPlace is null || DestinationPlace is null);
 
     public IReadOnlyList<TransportationOption> TransportationOptions { get; } = TransportationCatalog.All;
 
@@ -290,15 +294,25 @@ public partial class ScheduleEditViewModel : BaseViewModel, IDisposable
     private void UseRecentOrigin(Place? place)
     {
         if (place is null) return;
-        OriginPlace = place;
+        OriginPlace = ClonePlace(place);
     }
 
     [RelayCommand]
     private void UseRecentDestination(Place? place)
     {
         if (place is null) return;
-        DestinationPlace = place;
+        DestinationPlace = ClonePlace(place);
     }
+
+    public bool IsOriginSelected(Place? place)
+        => place is not null
+           && OriginPlace is not null
+           && AreSamePlace(OriginPlace, place);
+
+    public bool IsDestinationSelected(Place? place)
+        => place is not null
+           && DestinationPlace is not null
+           && AreSamePlace(DestinationPlace, place);
 
     private async Task SaveRecentPreferencesAsync(TransportationMode transportation)
     {

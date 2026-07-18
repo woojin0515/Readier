@@ -525,6 +525,12 @@ button {
     border-color: rgba(0, 0, 0, 0.15);
 }
 
+.button-secondary.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
 .button-tonal {
     background: rgba(0, 122, 255, 0.12);
     color: #007AFF;
