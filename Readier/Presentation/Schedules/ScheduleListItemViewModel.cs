@@ -33,4 +33,6 @@ public class ScheduleListItemViewModel
     public DateTime DisplayStartPrepAt => IsStartPrepLate ? AppClock.Now : StartPrepAt;
 
     public DateTime DisplayLeaveAt => IsLeaveLate ? AppClock.Now : LeaveAt;
+
+    public bool IsPastSchedule => StartTime < AppClock.Now;
 }

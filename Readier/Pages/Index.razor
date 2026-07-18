@@ -69,7 +69,7 @@
                 @foreach (var date in ViewModel.ThisWeekDates)
                 {
                     <button type="button"
-                            class="week-chip @(ViewModel.SelectedDate.Date == date.Date ? "active" : string.Empty)"
+                        class="week-chip @(date.Date < AppClock.Today ? "past" : string.Empty) @(ViewModel.SelectedDate.Date == date.Date ? "active" : string.Empty)"
                             @onclick="() => SelectThisWeekDateAsync(date)">
                         <span>@date.ToString("ddd")</span>
                         <strong>@date.ToString("M/d")</strong>
@@ -90,11 +90,15 @@
             <div class="stack">
                 @foreach (var item in ViewModel.VisibleItems)
                 {
-                    <article class="card schedule-card @(item.IsLeaveLate ? "late" : string.Empty)" @onclick="() => EditAsync(item)">
+                    <article class="card schedule-card @(item.IsLeaveLate ? "late" : string.Empty) @(item.IsPastSchedule ? "past" : string.Empty)" @onclick="() => EditAsync(item)">
                         <div class="time-column">@item.StartTime.ToString("HH:mm")</div>
                         <div class="accent-bar"></div>
                         <div class="schedule-content">
                             <div class="schedule-title">@item.Title</div>
+                            @if (item.IsPastSchedule)
+                            {
+                                <span class="status-pill past">지난 일정</span>
+                            }
                             @if (item.HasDestination)
                             {
                                 <div class="schedule-subtitle">@item.DestinationLabel</div>
@@ -130,7 +134,7 @@
             <div class="calendar-grid">
                 @foreach (var day in ViewModel.CalendarDays)
                 {
-                    <button type="button" class="calendar-day @(day.IsCurrentMonth ? string.Empty : "dimmed") @(day.IsSelected ? "selected" : string.Empty)" @onclick="() => SelectDateAsync(day.Date)">
+                    <button type="button" class="calendar-day @(day.IsCurrentMonth ? string.Empty : "dimmed") @(day.Date < AppClock.Today ? "past" : string.Empty) @(day.IsSelected ? "selected" : string.Empty)" @onclick="() => SelectDateAsync(day.Date)">
                         <span>@day.DayLabel</span>
                         @if (day.HasItems)
                         {
@@ -152,10 +156,14 @@
                 <div class="mini-list">
                     @foreach (var item in ViewModel.VisibleItems)
                     {
-                        <div class="mini-row" @onclick="() => EditAsync(item)">
+                        <div class="mini-row @(item.IsPastSchedule ? "past" : string.Empty)" @onclick="() => EditAsync(item)">
                             <span>@item.StartTime.ToString("HH:mm")</span>
                             <div class="mini-row-content">
                                 <div class="mini-row-title">@item.Title</div>
+                                @if (item.IsPastSchedule)
+                                {
+                                    <span class="status-pill past">지난 일정</span>
+                                }
                                 @if (item.HasDestination)
                                 {
                                     <div class="mini-row-subtitle">@item.DestinationLabel</div>

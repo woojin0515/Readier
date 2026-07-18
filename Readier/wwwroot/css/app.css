@@ -685,6 +685,22 @@ button {
     font-weight: var(--font-bold);
 }
 
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 var(--sp-8);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: var(--font-bold);
+    letter-spacing: 0.01em;
+}
+
+.status-pill.past {
+    background: rgba(107, 114, 128, 0.18);
+    color: #4b5563;
+}
+
 .save-status {
     margin-top: var(--sp-8);
     text-align: center;
@@ -703,6 +719,26 @@ button {
 
 .schedule-card.late .accent-bar {
     background: var(--danger);
+}
+
+.schedule-card.past {
+    background: rgba(230, 232, 236, 0.55);
+    border-color: rgba(107, 114, 128, 0.22);
+}
+
+.schedule-card.past .accent-bar {
+    background: #9ca3af;
+}
+
+.schedule-card.past .badge.prep,
+.schedule-card.past .badge.leave {
+    background: #9ca3af;
+}
+
+.schedule-card.past .schedule-title,
+.schedule-card.past .schedule-subtitle,
+.schedule-card.past .time-column {
+    color: #4b5563;
 }
 
 .card-delete {
@@ -779,6 +815,11 @@ button {
     opacity: 0.45;
 }
 
+.calendar-day.past:not(.selected) {
+    background: rgba(230, 232, 236, 0.45);
+    color: #6b7280;
+}
+
 .calendar-day.selected {
     background: var(--accent);
     color: #fff;
@@ -819,6 +860,10 @@ button {
 
 .mini-row:last-child {
     border-bottom: 0;
+}
+
+.mini-row.past {
+    opacity: 0.72;
 }
 
 .mini-row-content {
@@ -1242,6 +1287,11 @@ button {
 
 .week-chip.active strong {
     color: #fff;
+}
+
+.week-chip.past:not(.active) {
+    background: rgba(230, 232, 236, 0.5);
+    border-color: rgba(148, 163, 184, 0.35);
 }
 
 .next-summary-card {
